@@ -1,9 +1,20 @@
 [package]
 name = "flickrs-server"
 version = "0.1.0"
-authors = ["Thibaut Vandervelden <thvdveld@vub.be>"]
+authors = ["Thibaut Vandervelden <thvdveld@vub.be>", "Tom Godden <tgodden@vub.be"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "flickrs_sqlite"
+path = "src/lib.rs"
+
+[[bin]]
+name = "flickrs_server"
+path = "src/bin/main.rs"
 
 [dependencies]
+rocket = "0.4.6"
+diesel = {version = "1.4.5", default-features = false, features = ["sqlite"]}
+dotenv = "0.15.0"
+rocket_contrib = {version = "0.4.6", default-features = false, features = ["diesel_sqlite_pool"]}

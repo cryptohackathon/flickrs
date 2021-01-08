@@ -1,0 +1,4 @@
+target
+data/images/*
+flickrs.db
+../.idea/
