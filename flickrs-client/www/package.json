@@ -1,0 +1,33 @@
+{
+  "name": "flick-rs-app",
+  "version": "0.1.0",
+  "description": "Flic-rs app",
+  "main": "index.js",
+  "bin": {
+    "flick-rs-app": ".bin/flick-rs-app.js"
+  },
+  "scripts": {
+    "build": "webpack --config webpack.config.js",
+    "start": "webpack-dev-server",
+    "css:scss": "node-sass --output-style compressed -o dist src/scss",
+    "watch:css": "onchange \"src/scss\" -- npm run build:css"
+  },
+  "keywords": [
+    "webassembly",
+    "wasm",
+    "rust",
+    "webpack"
+  ],
+  "author": "Thibaut Vandervelden <thvdveld@vub.be>",
+  "devDependencies": {
+    "copy-webpack-plugin": "^5.0.0",
+    "flick-rs-wasm": "../pkg",
+    "node-sass": "^5.0.0",
+    "webpack": "^4.29.3",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.5"
+  },
+  "dependencies": {
+    "bootstrap": "^5.0.0-beta1"
+  }
+}
