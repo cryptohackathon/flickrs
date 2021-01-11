@@ -9,7 +9,6 @@ import { Button, Container } from 'react-bootstrap';
 ReactDOM.render(
   <Container>
     <App />
-    <Button onClick={() => alert("Hello World!")}>Testing</Button>
   </Container>,
   document.getElementById('root')
 );

@@ -3,6 +3,10 @@ import './App.css';
 
 import React from "react";
 
+import Image from "./image";
+import { Col, Row } from 'react-bootstrap';
+import ImageList from './image_list';
+
 class App extends React.Component {
   componentDidMount() {
     this.loadWasm();
@@ -12,17 +16,15 @@ class App extends React.Component {
     try {
       const wasm = await import('flick-rs-wasm');
       this.setState({ wasm });
-      wasm.end_to_end_conjunction();
+      // wasm.end_to_end_conjunction();
     } catch (err) {
       console.error(`Unexpected error in loadWasm. [Message: ${err.message}]`);
     }
   };
 
   render() {
-
     return (
-      <h1>Hello World</h1>
-
+      <ImageList></ImageList>
     );
   }
 }
