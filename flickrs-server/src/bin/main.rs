@@ -43,7 +43,7 @@ fn get_image_bytes(path: Option<String>) -> Json<GetImageReturnValue> {
 /// * Data Needed: None
 /// * Returns: {success: bool, image: Byte vector or Null, error: String or Null}
 #[get("/<image_id>")]
-fn get_image(connection: ImagesDbConn, image_id: i32) -> Json<GetImageReturnValue> {
+fn api_get_get_image(connection: ImagesDbConn, image_id: i32) -> Json<GetImageReturnValue> {
     match get_image_row(&*connection, &image_id) {
         Ok(row) => get_image_bytes(row.path),
         _ => Json(GetImageReturnValue{
@@ -70,7 +70,7 @@ struct UploadReturnValue {
 /// * Data Needed: Any data
 /// * Returns: {success: bool, id: int or NULL, error: string or Null}
 #[post("/upload", data="<data>")]
-fn upload(connection: ImagesDbConn, data: Data) -> Json<UploadReturnValue> {
+fn api_post_upload_image(connection: ImagesDbConn, data: Data) -> Json<UploadReturnValue> {
     let id = allocate_image_row(&*connection);
     let filename = format!("{}{}", env::var("IMAGE_BASE_URL").expect("Image path not set!"), id);
     data.stream_to_file(&filename).expect("Could not read file");
