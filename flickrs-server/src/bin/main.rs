@@ -9,6 +9,7 @@ use std::env;
 use dotenv::dotenv;
 use std::fs;
 use serde::Serialize;
+use flickrs_sqlite::models::Attribute;
 
 /// The struct needed to connect to the database
 #[database("imagesdb")]
@@ -53,7 +54,7 @@ fn api_get_get_image(connection: ImagesDbConn, image_id: i32) -> Json<GetImageRe
     }
 }
 
-/// The return velue from the /upload POST operation
+/// The return value from the /upload POST operation
 #[derive(Serialize)]
 struct UploadReturnValue {
     succes: bool,
@@ -86,6 +87,6 @@ fn main() {
     dotenv().ok();
     rocket::ignite()
         .attach(ImagesDbConn::fairing())
-        .mount("/", routes![get_image, upload])
+        .mount("/", routes![api_get_get_image, api_post_upload_image])
         .launch();
 }
