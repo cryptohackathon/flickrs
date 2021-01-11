@@ -2,7 +2,7 @@ pub mod schema;
 pub mod models;
 
 use diesel::prelude::*;
-use crate::models::Image;
+use crate::models::{Image, Attribute, NewAttribute};
 
 extern crate dotenv;
 #[macro_use] extern crate diesel;
@@ -40,4 +40,39 @@ pub fn get_image_row(conn: &SqliteConnection, image_id: &i32) -> Result<Image, d
     use self::schema::images::dsl::{id,images};
     images.filter(id.eq(image_id))
         .first::<Image>(conn)
+}
+
+/// Get all attributes
+pub fn get_all_attributes(conn: &SqliteConnection) -> Result<Vec<Attribute>, diesel::result::Error> {
+    use self::schema::attributes::dsl::attributes;
+    attributes.load(conn)
+}
+
+/// Get an attribute entry by its id
+///
+/// We use .first because the id is UNIQUE in the database scheme
+pub fn get_attribute_by_id(conn: &SqliteConnection, attribute_id: &i32) -> Result<Attribute, diesel::result::Error> {
+    use self::schema::attributes::dsl::{id,attributes};
+    attributes.filter(id.eq(attribute_id))
+        .first::<Attribute>(conn)
+}
+
+/// Get an attribute entry by its name
+///
+/// We use .first because the name is UNIQUE in the database scheme
+pub fn get_attribute_by_name(conn: &SqliteConnection, attribute_name: &str) -> Result<Attribute, diesel::result::Error> {
+    use self::schema::attributes::dsl::{name,attributes};
+    attributes.filter(name.eq(attribute_name))
+        .first::<Attribute>(conn)
+}
+
+/// Add a new attribute by name
+pub fn add_attribute(conn: &SqliteConnection, name: &str) -> Result<i32, diesel::result::Error> {
+    use self::schema::attributes;
+    let res =  diesel::insert_into(attributes::table)
+        .values(NewAttribute{name})
+        .execute(conn);
+    res.map(|_| diesel::select(last_insert_rowid)
+        .get_result::<i32>(conn).unwrap())
+
 }
