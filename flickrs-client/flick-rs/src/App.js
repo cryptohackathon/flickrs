@@ -16,7 +16,6 @@ class App extends React.Component {
     try {
       const wasm = await import('flick-rs-wasm');
       this.setState({ wasm });
-      // wasm.end_to_end_conjunction();
     } catch (err) {
       console.error(`Unexpected error in loadWasm. [Message: ${err.message}]`);
     }
