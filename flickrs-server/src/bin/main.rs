@@ -10,6 +10,7 @@ use dotenv::dotenv;
 use std::fs;
 use serde::Serialize;
 use flickrs_sqlite::models::Attribute;
+use std::str::from_utf8;
 
 /// The struct needed to connect to the database
 #[database("imagesdb")]
@@ -149,8 +150,8 @@ fn api_get_get_attribute_by_name(connection: ImagesDbConn, attribute: String) ->
 /// * Data Needed: String containing the new name
 /// * Returns: {success: bool, id: int or NULL, error: string or Null}
 #[post("/attributes/new", data="<data>")]
-fn api_post_new_attribute(connection: ImagesDbConn, data: String) -> Json<UploadReturnValue> {
-    Json(match add_attribute(&*connection, &data){
+fn api_post_new_attribute(connection: ImagesDbConn, data: Data) -> Json<UploadReturnValue> {
+    Json(match add_attribute(&*connection, from_utf8(data.peek()).unwrap()){
         Ok(id) => UploadReturnValue{success: true, id:Some(id), error: None},
         Err(e) => UploadReturnValue{success: false, id: None,
             error: Some(e.to_string())}
