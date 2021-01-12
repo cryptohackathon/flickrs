@@ -28,5 +28,5 @@ pub fn end_to_end_conjunction() {
 
 #[wasm_bindgen]
 pub fn get_image_title() -> String {
-    "hello from rust".into()
+    "Hello from Rust".into()
 }
