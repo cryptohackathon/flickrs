@@ -16,6 +16,18 @@ use std::str::from_utf8;
 #[database("imagesdb")]
 pub struct ImagesDbConn(diesel::SqliteConnection);
 
+/// Fetch the bytes of an image with a given path.
+fn get_image_bytes(path: Option<String>) -> GetImageReturnValue {
+    match path {
+        None => GetImageReturnValue{success: false, image: None,
+            error: Some("image path was NULL".to_string())},
+        Some(a) => match fs::read(a) {
+            Ok(v) => GetImageReturnValue{success: true, image: Some(v), error: None},
+            Err(e) => GetImageReturnValue{success: false, image: None,
+                error: Some(e.to_string())}
+        }}
+}
+
 /// The return value of the /<image_id> GET operation
 #[derive(Serialize)]
 struct GetImageReturnValue {
@@ -23,20 +35,6 @@ struct GetImageReturnValue {
     image: Option<Vec<u8>>,
     error: Option<String>,
 }
-
-/// Fetch the bytes of an image with a given path.
-fn get_image_bytes(path: Option<String>) -> Json<GetImageReturnValue> {
-    let value = match path {
-        None => GetImageReturnValue{success: false, image: None,
-            error: Some("image path was NULL".to_string())},
-        Some(a) => match fs::read(a) {
-            Ok(v) => GetImageReturnValue{success: true, image: Some(v), error: None},
-            Err(e) => GetImageReturnValue{success: false, image: None,
-                error: Some(e.to_string())}
-        }};
-    Json(value)
-}
-
 
 /// GET the image with given id.
 ///
@@ -46,13 +44,44 @@ fn get_image_bytes(path: Option<String>) -> Json<GetImageReturnValue> {
 /// * Returns: {success: bool, image: Byte vector or Null, error: String or Null}
 #[get("/<image_id>")]
 fn api_get_get_image(connection: ImagesDbConn, image_id: i32) -> Json<GetImageReturnValue> {
-    match get_image_row(&*connection, &image_id) {
+    Json(match get_image_row(&*connection, &image_id) {
         Ok(row) => get_image_bytes(row.path),
-        _ => Json(GetImageReturnValue{
+        _ => GetImageReturnValue{
                   success: false,
                   image: None,
-                  error: Some(format!("image with id {} does not exist in the database", image_id))}),
+                  error: Some(format!("image with id {} does not exist in the database", image_id))},
+    })
+}
+
+
+/// The return value of the /images GET operation
+#[derive(Serialize)]
+struct GetImagesReturnValue {
+    success: bool,
+    images: Option<Vec<Vec<u8>>>,
+    error: Option<String>,
+}
+/// GET all images
+///
+/// ## API
+/// * Address: root/images
+/// * Data Needed: None
+/// * Returns: {success: bool, image: List<Byte vector> or Null, error: String or Null}
+#[get("/images")]
+fn api_get_all_images(connection: ImagesDbConn) -> Json<GetImagesReturnValue> {
+    let paths = get_all_image_paths(&*connection);
+    if paths.is_err() {
+        return Json(GetImagesReturnValue{success: false, images: None,
+            error: paths.err().map(|e| e.to_string())})
     }
+    let paths = paths.unwrap();
+    let images = paths.into_iter()
+        .filter(Option::is_some)
+        .map(get_image_bytes)
+        .filter(|i| i.success)
+        .map(|i| i.image.unwrap())
+        .collect();
+    Json(GetImagesReturnValue{success: true, images: Some(images), error: None})
 }
 
 /// The return value from the /upload POST operation
@@ -166,6 +195,7 @@ fn main() {
         .mount("/", routes![
         api_get_get_image,
          api_post_upload_image,
+         api_get_all_images,
          api_get_all_attributes,
          api_get_get_attribute_by_id,
          api_get_get_attribute_by_name,

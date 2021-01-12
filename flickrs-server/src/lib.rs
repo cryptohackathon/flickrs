@@ -43,6 +43,12 @@ pub fn get_image_row(conn: &SqliteConnection, image_id: &i32) -> Result<Image, d
 }
 
 /// Get all attributes
+pub fn get_all_image_paths(conn: &SqliteConnection) -> Result<Vec<Option<String>>, diesel::result::Error> {
+    use self::schema::images::dsl::{images, path};
+    images.select(path).load(conn)
+}
+
+/// Get all attributes
 pub fn get_all_attributes(conn: &SqliteConnection) -> Result<Vec<Attribute>, diesel::result::Error> {
     use self::schema::attributes::dsl::attributes;
     attributes.load(conn)
