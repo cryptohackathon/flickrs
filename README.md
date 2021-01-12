@@ -2,7 +2,7 @@
 [![coverage report](https://gitlab.com/etrovub/smartnets/flickrs/badges/master/coverage.svg)](https://gitlab.com/etrovub/smartnets/flickrs/-/commits/master)
 
 # FlickRS
-
+![FlickRS logo](./flick-rs.png)
 ## How to run client
 
 In `./flickrs-client/` run the following commands:
