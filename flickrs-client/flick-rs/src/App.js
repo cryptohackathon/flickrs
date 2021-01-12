@@ -3,7 +3,6 @@ import './App.css';
 
 import React from "react";
 
-import Image from "./image";
 import { Col, Row } from 'react-bootstrap';
 import ImageList from './image_list';
 
@@ -41,7 +40,10 @@ class App extends React.Component {
     };
     fetch('/images', requestOptions)
       .then(response => response.json())
-      .then(data => { this.setState({ imgs: data.images }); console.log(this.state); });
+      .then(data => {
+        console.log(data["images"]);
+        this.setState({ imgs: data["images"] });
+      });
   }
 
 
