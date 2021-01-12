@@ -8,8 +8,13 @@ import { Col, Row } from 'react-bootstrap';
 import ImageList from './image_list';
 
 class App extends React.Component {
-  componentDidMount() {
-    this.loadWasm();
+  constructor(props) {
+    super(props);
+    this.state = {
+      imgs: [],
+    };
+
+    this.updateImages = this.updateImages.bind(this);
   }
 
   loadWasm = async () => {
@@ -21,9 +26,29 @@ class App extends React.Component {
     }
   };
 
+  updateImages(imgs) {
+    this.setState(state => ({
+      imgs: imgs,
+    }));
+  }
+
+  componentDidMount() {
+    this.loadWasm();
+
+    // Get the images
+    const requestOptions = {
+      method: 'GET'
+    };
+    fetch('/images', requestOptions)
+      .then(response => response.json())
+      .then(data => { this.setState({ imgs: data.images }); console.log(this.state); });
+  }
+
+
   render() {
-    return (
-      <ImageList></ImageList>
+    const { imgs } = this.state;
+    return imgs && (
+      <ImageList imgs={this.state.imgs}></ImageList>
     );
   }
 }

@@ -4,16 +4,14 @@ import { Col, Row } from 'react-bootstrap';
 import Image from "./image";
 import ImageDescription from "./image_description"
 
-let images = [0, 1];
-
 class ImageList extends React.Component {
     render() {
-        return (
-            images.map((e, i) => {
+        return this.props.imgs && (
+            this.props.imgs.map((e, i) => {
                 return (
                     <Row className="my-3 py-3 border rounded shadow">
                         <Col xs={8}>
-                            <Image></Image>
+                            <Image data={this.props.imgs[i]}></Image>
                         </Col>
                         <Col xs={4}>
                             <ImageDescription></ImageDescription>
