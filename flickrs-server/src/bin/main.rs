@@ -237,6 +237,25 @@ fn api_get_get_attribute_by_name(
     })
 }
 
+/// The return value for a /setup GET request
+#[derive(Serialize, Deserialize)]
+struct ServerKeyResponse {
+    server_key: cife_rs::abe::dippe::PublicKey,
+}
+
+/// GET the authority public key that is used for all attributes.
+///
+/// ## API
+/// * Address: root/setup
+/// * Data Needed: None
+/// * Returns: {server_key: PublicKey}
+#[get("/setup")]
+fn api_get_server_key(keys: State<KeyMaterial>) -> Json<ServerKeyResponse> {
+    Json(ServerKeyResponse {
+        server_key: keys.inner().public.clone(),
+    })
+}
+
 /// The request body of the /user/register POST operation
 #[derive(Serialize, Deserialize)]
 struct RegistrationRequest {
@@ -375,6 +394,7 @@ fn main() {
                 api_get_get_attribute_by_name,
                 api_post_new_attribute,
                 api_post_register_user_with_attributes,
+                api_get_server_key,
             ],
         )
         .launch();
