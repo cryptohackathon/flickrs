@@ -1,15 +1,17 @@
 #![feature(proc_macro_hygiene, decl_macro)]
-#[macro_use] extern crate rocket;
-#[macro_use] extern crate rocket_contrib;
+#[macro_use]
+extern crate rocket;
+#[macro_use]
+extern crate rocket_contrib;
 extern crate dotenv;
+use dotenv::dotenv;
+use flickrs_sqlite::models::Attribute;
+use flickrs_sqlite::*;
 use rocket::Data;
 use rocket_contrib::json::Json;
-use flickrs_sqlite::*;
-use std::env;
-use dotenv::dotenv;
-use std::fs;
 use serde::Serialize;
-use flickrs_sqlite::models::Attribute;
+use std::env;
+use std::fs;
 use std::str::from_utf8;
 
 /// The struct needed to connect to the database
@@ -19,13 +21,24 @@ pub struct ImagesDbConn(diesel::SqliteConnection);
 /// Fetch the bytes of an image with a given path.
 fn get_image_bytes(path: Option<String>) -> GetImageReturnValue {
     match path {
-        None => GetImageReturnValue{success: false, image: None,
-            error: Some("image path was NULL".to_string())},
+        None => GetImageReturnValue {
+            success: false,
+            image: None,
+            error: Some("image path was NULL".to_string()),
+        },
         Some(a) => match fs::read(a) {
-            Ok(v) => GetImageReturnValue{success: true, image: Some(v), error: None},
-            Err(e) => GetImageReturnValue{success: false, image: None,
-                error: Some(e.to_string())}
-        }}
+            Ok(v) => GetImageReturnValue {
+                success: true,
+                image: Some(v),
+                error: None,
+            },
+            Err(e) => GetImageReturnValue {
+                success: false,
+                image: None,
+                error: Some(e.to_string()),
+            },
+        },
+    }
 }
 
 /// The return value of the /<image_id> GET operation
@@ -46,13 +59,16 @@ struct GetImageReturnValue {
 fn api_get_get_image(connection: ImagesDbConn, image_id: i32) -> Json<GetImageReturnValue> {
     Json(match get_image_row(&*connection, &image_id) {
         Ok(row) => get_image_bytes(row.path),
-        _ => GetImageReturnValue{
-                  success: false,
-                  image: None,
-                  error: Some(format!("image with id {} does not exist in the database", image_id))},
+        _ => GetImageReturnValue {
+            success: false,
+            image: None,
+            error: Some(format!(
+                "image with id {} does not exist in the database",
+                image_id
+            )),
+        },
     })
 }
-
 
 /// The return value of the /images GET operation
 #[derive(Serialize)]
@@ -71,17 +87,25 @@ struct GetImagesReturnValue {
 fn api_get_all_images(connection: ImagesDbConn) -> Json<GetImagesReturnValue> {
     let paths = get_all_image_paths(&*connection);
     if paths.is_err() {
-        return Json(GetImagesReturnValue{success: false, images: None,
-            error: paths.err().map(|e| e.to_string())})
+        return Json(GetImagesReturnValue {
+            success: false,
+            images: None,
+            error: paths.err().map(|e| e.to_string()),
+        });
     }
     let paths = paths.unwrap();
-    let images = paths.into_iter()
+    let images = paths
+        .into_iter()
         .filter(Option::is_some)
         .map(get_image_bytes)
         .filter(|i| i.success)
         .map(|i| i.image.unwrap())
         .collect();
-    Json(GetImagesReturnValue{success: true, images: Some(images), error: None})
+    Json(GetImagesReturnValue {
+        success: true,
+        images: Some(images),
+        error: None,
+    })
 }
 
 /// The return value from the /upload POST operation
@@ -100,16 +124,27 @@ struct UploadReturnValue {
 /// * Address: root/upload
 /// * Data Needed: Any data
 /// * Returns: {success: bool, id: int or Null, error: string or Null}
-#[post("/upload", data="<data>")]
+#[post("/upload", data = "<data>")]
 fn api_post_upload_image(connection: ImagesDbConn, data: Data) -> Json<UploadReturnValue> {
     let id = allocate_image_row(&*connection);
-    let filename = format!("{}{}", env::var("IMAGE_BASE_URL").expect("Image path not set!"), id);
+    let filename = format!(
+        "{}{}",
+        env::var("IMAGE_BASE_URL").expect("Image path not set!"),
+        id
+    );
     data.stream_to_file(&filename).expect("Could not read file");
     Json(match set_image_path(&*connection, &id, &filename) {
-        Ok(_) => UploadReturnValue{success: true, id: Some(id), error: None},
-        Err(e) => UploadReturnValue{success: false, id: None, error: Some(e.to_string())},
+        Ok(_) => UploadReturnValue {
+            success: true,
+            id: Some(id),
+            error: None,
+        },
+        Err(e) => UploadReturnValue {
+            success: false,
+            id: None,
+            error: Some(e.to_string()),
+        },
     })
-
 }
 
 /// The return value from the /attributes GET operation
@@ -129,13 +164,18 @@ struct AttributesReturnValue {
 #[get("/attributes")]
 fn api_get_all_attributes(connection: ImagesDbConn) -> Json<AttributesReturnValue> {
     Json(match get_all_attributes(&*connection) {
-        Ok(attributes) => AttributesReturnValue{success: true,
-            attributes: Some(attributes), error: None},
-        Err(e) => AttributesReturnValue{success: false,
-            attributes: None, error: Some(e.to_string())}
+        Ok(attributes) => AttributesReturnValue {
+            success: true,
+            attributes: Some(attributes),
+            error: None,
+        },
+        Err(e) => AttributesReturnValue {
+            success: false,
+            attributes: None,
+            error: Some(e.to_string()),
+        },
     })
 }
-
 
 /// The return value from the /attributes/<attribute> GET operation
 #[derive(Serialize)]
@@ -150,11 +190,22 @@ struct AttributeReturnValue {
 /// * Address: root/attributes/<attribute>
 /// * Data Needed: None
 /// * Returns: {success: bool, attribute: {id: int, name: string} or Null, error: string or Null}
-#[get("/attributes/<attribute>", rank=0)]
-fn api_get_get_attribute_by_id(connection: ImagesDbConn, attribute: i32) -> Json<AttributeReturnValue> {
+#[get("/attributes/<attribute>", rank = 0)]
+fn api_get_get_attribute_by_id(
+    connection: ImagesDbConn,
+    attribute: i32,
+) -> Json<AttributeReturnValue> {
     Json(match get_attribute_by_id(&*connection, &attribute) {
-        Ok(attribute) => AttributeReturnValue{success: true, attribute: Some(attribute), error: None},
-        Err(e) => AttributeReturnValue{success: false, attribute: None, error: Some(e.to_string())}
+        Ok(attribute) => AttributeReturnValue {
+            success: true,
+            attribute: Some(attribute),
+            error: None,
+        },
+        Err(e) => AttributeReturnValue {
+            success: false,
+            attribute: None,
+            error: Some(e.to_string()),
+        },
     })
 }
 /// GET an attribute from the database based on the attribute's name
@@ -163,11 +214,22 @@ fn api_get_get_attribute_by_id(connection: ImagesDbConn, attribute: i32) -> Json
 /// * Address: root/attributes/<attribute>
 /// * Data Needed: None
 /// * Returns: {success: bool, attribute: {id: int, name: string} or Null, error: string or Null}
-#[get("/attributes/<attribute>", rank=1)]
-fn api_get_get_attribute_by_name(connection: ImagesDbConn, attribute: String) -> Json<AttributeReturnValue> {
+#[get("/attributes/<attribute>", rank = 1)]
+fn api_get_get_attribute_by_name(
+    connection: ImagesDbConn,
+    attribute: String,
+) -> Json<AttributeReturnValue> {
     Json(match get_attribute_by_name(&*connection, &attribute) {
-        Ok(attribute) => AttributeReturnValue{success: true, attribute: Some(attribute), error: None},
-        Err(e) => AttributeReturnValue{success: false, attribute: None, error: Some(e.to_string())}
+        Ok(attribute) => AttributeReturnValue {
+            success: true,
+            attribute: Some(attribute),
+            error: None,
+        },
+        Err(e) => AttributeReturnValue {
+            success: false,
+            attribute: None,
+            error: Some(e.to_string()),
+        },
     })
 }
 
@@ -178,13 +240,22 @@ fn api_get_get_attribute_by_name(connection: ImagesDbConn, attribute: String) ->
 /// * Address: root/attributes/new
 /// * Data Needed: String containing the new name
 /// * Returns: {success: bool, id: int or NULL, error: string or Null}
-#[post("/attributes/new", data="<data>")]
+#[post("/attributes/new", data = "<data>")]
 fn api_post_new_attribute(connection: ImagesDbConn, data: Data) -> Json<UploadReturnValue> {
-    Json(match add_attribute(&*connection, from_utf8(data.peek()).unwrap()){
-        Ok(id) => UploadReturnValue{success: true, id:Some(id), error: None},
-        Err(e) => UploadReturnValue{success: false, id: None,
-            error: Some(e.to_string())}
-    })
+    Json(
+        match add_attribute(&*connection, from_utf8(data.peek()).unwrap()) {
+            Ok(id) => UploadReturnValue {
+                success: true,
+                id: Some(id),
+                error: None,
+            },
+            Err(e) => UploadReturnValue {
+                success: false,
+                id: None,
+                error: Some(e.to_string()),
+            },
+        },
+    )
 }
 
 ///Launch the application
@@ -192,14 +263,17 @@ fn main() {
     dotenv().ok();
     rocket::ignite()
         .attach(ImagesDbConn::fairing())
-        .mount("/", routes![
-        api_get_get_image,
-         api_post_upload_image,
-         api_get_all_images,
-         api_get_all_attributes,
-         api_get_get_attribute_by_id,
-         api_get_get_attribute_by_name,
-         api_post_new_attribute,
-         ])
+        .mount(
+            "/",
+            routes![
+                api_get_get_image,
+                api_post_upload_image,
+                api_get_all_images,
+                api_get_all_attributes,
+                api_get_get_attribute_by_id,
+                api_get_get_attribute_by_name,
+                api_post_new_attribute,
+            ],
+        )
         .launch();
 }
