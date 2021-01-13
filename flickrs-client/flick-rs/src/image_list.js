@@ -19,7 +19,7 @@ class ImageList extends React.Component {
                             <img src={imageUrl} className="img-fluid rounded" />
                         </Col>
                         <Col xs={4}>
-                            <ImageDescription></ImageDescription>
+                            <ImageDescription wasm={this.props.wasm}></ImageDescription>
                         </Col>
                     </Row>
                 );

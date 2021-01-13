@@ -25,7 +25,7 @@ class Registration extends React.Component {
             });
     }
 
-    handleClick(event) {
+    handleRegistration(event) {
         //Do the registration.
 
         const attrs = this.state.selected_attrs.map(x => parseInt(x));
@@ -49,8 +49,9 @@ class Registration extends React.Component {
             }
         }).then(data => {
             console.log(data);
-            this.props.onRegistration(this.state.gid, this.state.selected_attrs, 0);
+            this.props.onRegistration(this.state.gid, this.state.selected_attrs, data.registration_key);
         });
+
     }
 
     handleChecked(event) {
@@ -98,7 +99,7 @@ class Registration extends React.Component {
                             })
                         }
                         <br></br>
-                        <Button onClick={(event) => this.handleClick(event)}>Continue</Button>
+                        <Button onClick={(event) => this.handleRegistration(event)}>Continue</Button>
                     </Form>
                 </Col>
             </Row >
