@@ -306,8 +306,9 @@ fn api_post_register_user_with_attributes(
         .max()
         .map(|x| x + 1)
         .unwrap_or(0) as usize;
+    let av_len = attr_count + 1;
     // We are the authority for every single key
-    let authorities: Vec<_> = (0..attr_count).map(|_i| &keys.public).collect();
+    let authorities: Vec<_> = (0..av_len).map(|_i| &keys.public).collect();
 
     let mut av = vec![];
     for attr in db_attrs {
@@ -328,7 +329,7 @@ fn api_post_register_user_with_attributes(
     let av = keys.dippe.create_attribute_vector(attr_count, &av);
 
     let mut upks = vec![];
-    for i in 0..attr_count {
+    for i in 0..av_len {
         let upk = keys.dippe.generate_user_private_key_part(
             &keys.private,
             i,
