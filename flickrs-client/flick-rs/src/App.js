@@ -37,14 +37,14 @@ class App extends React.Component {
   };
 
   serverSetup() {
-    fetch("/setup", { method: "GET" })
+    fetch("/api/setup", { method: "GET" })
       .then(response => response.json())
       .then(data => this.setState({ server_key: data["server_key"] }));
   }
 
   getImages() {
     // Get the images, better would be one by one.
-    fetch('/images', { method: "GET" })
+    fetch('/api/images', { method: "GET" })
       .then(response => response.json())
       .then(data => {
         console.log(data["images"]);

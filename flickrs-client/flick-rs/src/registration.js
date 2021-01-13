@@ -17,7 +17,7 @@ class Registration extends React.Component {
     }
 
     componentDidMount() {
-        fetch("/attributes", { method: "GET" })
+        fetch("/api/attributes", { method: "GET" })
             .then(response => response.json())
             .then(data => {
                 console.log(data);
@@ -32,7 +32,7 @@ class Registration extends React.Component {
 
         const data = JSON.stringify({ gid: this.state.gid, attributes: attrs });
 
-        fetch("/user/register",
+        fetch("/api/user/register",
             {
                 credentials: "same-origin",
                 mode: "same-origin",
