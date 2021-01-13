@@ -237,14 +237,14 @@ fn api_get_get_attribute_by_name(
     })
 }
 
-/// The return value of the /<image_id> GET operation
+/// The request body of the /user/register POST operation
 #[derive(Serialize, Deserialize)]
 struct RegistrationRequest {
     gid: String,
     attributes: Vec<i32>,
 }
 
-/// The return value of the /<image_id> GET operation
+/// The return value of the /user/register POST operation
 #[derive(Serialize)]
 struct RegistrationDetails {
     success: bool,
