@@ -145,3 +145,22 @@ pages:
   artifacts:
     paths:
       - public
+
+deploy:k8s:
+  image: devth/helm
+  dependencies:
+    - build:docker:client
+    - build:docker:apiserver
+  needs:
+    - build:docker:client
+    - build:docker:apiserver
+  stage: deploy
+  # only:
+  #   - master
+  before_script:
+    - .ci/kube-login.sh
+  script:
+    - kubectl -n $NAMESPACE apply -f flickrs-k8s.yaml
+    - kubectl -n $NAMESPACE rollout restart deployment.apps/flickrs-api
+    - kubectl -n $NAMESPACE rollout restart deployment.apps/flickrs-static
+    - kubectl -n $NAMESPACE rollout restart deployment.apps/flickrs-virtual-host
