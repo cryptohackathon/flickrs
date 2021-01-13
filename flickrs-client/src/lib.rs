@@ -30,3 +30,9 @@ pub fn end_to_end_conjunction() {
 pub fn get_image_title() -> String {
     "Hello from Rust".into()
 }
+
+#[wasm_bindgen]
+pub fn try_deserde(val: &JsValue) {
+    let key: UserPrivateKey = val.into_serde().unwrap();
+    alert("Deserialized!!");
+}

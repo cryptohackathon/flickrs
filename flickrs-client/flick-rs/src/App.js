@@ -10,6 +10,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      wasm: null,
       isRegistered: false,
       imgs: [],
       gid: null,
@@ -60,6 +61,8 @@ class App extends React.Component {
       attrs: attrs,
       registration_key: key,
     });
+
+    this.state.wasm.try_deserde(key);
 
     // TODO: just for now to display something.
     this.getImages();
