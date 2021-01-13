@@ -12,8 +12,8 @@ stages:
     key: docker
   stage: build
   before_script:
-    - touch /kaniko/.docker/config.json
-    - echo "$DOCKER_REGISTRY_CRT" >> /kaniko/ssl/certs/ca-certificates.crt
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
     - echo "Working around https://github.com/GoogleContainerTools/kaniko/issues/595"
     - rm -f .dockerignore
 
