@@ -1,0 +1,226 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flickrs-static
+  labels:
+    app: flickrs-static
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: flickrs-static
+  template:
+    metadata:
+      labels:
+        app: flickrs-static
+    spec:
+      imagePullSecrets:
+      - name: regcred
+      containers:
+      - name: flickrs-static
+        imagePullPolicy: Always
+        image: registry.gitlab.com/etrovub/smartnets/flickrs/nginx-static:master
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flickrs-api
+  labels:
+    app: flickrs-api
+spec:
+  replicas: 1
+  # As long as we use sqlite, we need Recreate instead of roll-over
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: flickrs-api
+  template:
+    metadata:
+      labels:
+        app: flickrs-api
+    spec:
+      imagePullSecrets:
+      - name: regcred
+      containers:
+      - name: flickrs-api
+        imagePullPolicy: Always
+        image: registry.gitlab.com/etrovub/smartnets/flickrs/apiserver:master
+        env:
+        - name: RUST_BACKTRACE
+          value: "1"
+        - name: RUST_LOG
+          value: debug
+        - name: ROCKET_DATABASES
+          value: '{imagesdb={url="/var/lib/flickrs/images.sqlite"}}'
+        volumeMounts:
+        - name: flickrs-storage
+          mountPath: /var/lib/flickrs
+      volumes:
+        - name: flickrs-storage
+          persistentVolumeClaim:
+            claimName: flickrs-storage
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: flickrs-storage
+spec:
+  storageClassName: rbd-csi
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: flickrs-api
+  name: flickrs-api
+spec:
+  clusterIP: None
+  ports:
+  - port: 8000
+    name: web
+  selector:
+    app: flickrs-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: flickrs-static
+  name: flickrs-static
+spec:
+  clusterIP: None
+  ports:
+  - port: 80
+    name: web
+  selector:
+    app: flickrs-static
+
+
+
+# Virtual hosting: nginx configurations
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nginx-confd
+type: Opaque
+stringData:
+  flickrs.conf: |
+    types {
+      application/wasm wasm;
+    }
+
+    server {
+      server_name "flickrs.opencloudedge.be";
+
+      location /api {
+        proxy_redirect          off;
+        proxy_pass_header       Server;
+        proxy_set_header        X-Real-IP $remote_addr;
+        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Scheme $scheme;
+        proxy_set_header        Host $http_host;
+        proxy_set_header        X-NginX-Proxy true;
+        proxy_connect_timeout   5;
+        proxy_read_timeout      240;
+        proxy_intercept_errors  on;
+
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        resolver kube-dns.kube-system.svc.cluster.local valid=5s;
+        proxy_pass "http://flickrs-api.flickrs.svc.cluster.local:8000";
+      }
+
+      location / {
+        proxy_redirect          off;
+        proxy_pass_header       Server;
+        proxy_set_header        X-Real-IP $remote_addr;
+        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Scheme $scheme;
+        proxy_set_header        Host $http_host;
+        proxy_set_header        X-NginX-Proxy true;
+        proxy_connect_timeout   5;
+        proxy_read_timeout      240;
+        proxy_intercept_errors  on;
+
+        resolver kube-dns.kube-system.svc.cluster.local valid=5s;
+        proxy_pass "http://flickrs-static.flickrs.svc.cluster.local:80";
+      }
+    }
+---
+# Virtual hosting: nginx
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flickrs-virtual-host
+  labels:
+    app: flickrs-virtual-host
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flickrs-virtual-host
+  template:
+    metadata:
+      labels:
+        app: flickrs-virtual-host
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.19.3
+        ports:
+        - containerPort: 80
+          name: flickrs-virtual
+        volumeMounts:
+        - name: nginx-confd
+          mountPath: "/etc/nginx/conf.d/"
+          readOnly: true
+      volumes:
+      - name: nginx-confd
+        secret:
+          secretName: nginx-confd
+---
+# Virtual hosting service
+apiVersion: v1
+kind: Service
+metadata:
+  name: flickrs-virtual-host
+  labels:
+    app: flickrs-virtual-host
+spec:
+  ports:
+  - port: 80
+    name: flickrs-virtual
+  clusterIP: None
+  selector:
+    app: flickrs-virtual-host
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-flickrs
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: "nginx-public"
+    cert-manager.io/cluster-issuer: letsencrypt-cloudflare-production
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  rules:
+  - host: "flickrs.opencloudedge.be"
+    http:
+      paths:
+      - backend:
+          serviceName: flickrs-virtual-host
+          servicePort: 80
+  tls:
+  - hosts:
+    - 'flickrs.opencloudedge.be'
+    secretName: flickrs-tls
