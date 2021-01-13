@@ -1,15 +1,16 @@
-import logo from './logo.svg';
 import './App.css';
 
 import React from "react";
 
-import { Col, Row } from 'react-bootstrap';
-import ImageList from './image_list';
+// import { Col, Row } from 'react-bootstrap';
+// import ImageList from './image_list';
+import Registration from './registration';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      isRegistered: false,
       imgs: [],
     };
 
@@ -35,23 +36,31 @@ class App extends React.Component {
     this.loadWasm();
 
     // Get the images
-    const requestOptions = {
-      method: 'GET'
-    };
-    fetch('/images', requestOptions)
-      .then(response => response.json())
-      .then(data => {
-        console.log(data["images"]);
-        this.setState({ imgs: data["images"] });
-      });
+    // const requestOptions = {
+    //   method: 'GET'
+    // };
+    // fetch('/images', requestOptions)
+    //   .then(response => response.json())
+    //   .then(data => {
+    //     console.log(data["images"]);
+    //     this.setState({ imgs: data["images"] });
+    //   });
+  }
+
+  onRegistration(guid, attrs, key) {
+    console.log(guid);
+    console.log(attrs);
+    console.log(key);
   }
 
 
   render() {
-    const { imgs } = this.state;
-    return imgs && (
-      <ImageList imgs={this.state.imgs}></ImageList>
-    );
+    // const { imgs } = this.state;
+    // return imgs && (
+    //   <ImageList imgs={this.state.imgs}></ImageList>
+    // );
+
+    return <Registration onRegistration={this.onRegistration}></Registration>
   }
 }
 
