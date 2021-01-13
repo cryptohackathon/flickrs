@@ -384,7 +384,7 @@ fn main() {
         .attach(ImagesDbConn::fairing())
         .manage(keys)
         .mount(
-            "/",
+            "/api/",
             routes![
                 api_get_get_image,
                 api_post_upload_image,
