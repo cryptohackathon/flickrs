@@ -4,6 +4,19 @@ stages:
   - test
   - deploy
 
+.kaniko: &kaniko
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  cache:
+    key: docker
+  stage: build
+  before_script:
+    - touch /kaniko/.docker/config.json
+    - echo "$DOCKER_REGISTRY_CRT" >> /kaniko/ssl/certs/ca-certificates.crt
+    - echo "Working around https://github.com/GoogleContainerTools/kaniko/issues/595"
+    - rm -f .dockerignore
+
 .rust: &rust
   cache: &rust-cache
     paths:
@@ -34,6 +47,28 @@ stages:
   script:
     - cargo build
     - cargo build --release
+
+build:docker:client:
+  <<: *kaniko
+  stage: build
+  only:
+    - branches
+  script:
+    - /kaniko/executor --context $CI_PROJECT_DIR/flickrs-client \
+      --dockerfile $CI_PROJECT_DIR/flickrs-client/Dockerfile \
+      --destination $CI_REGISTRY_IMAGE/nginx-static:$CI_COMMIT_REF_SLUG \
+      --cache=true
+
+build:docker:apiserver:
+  <<: *kaniko
+  stage: build
+  only:
+    - branches
+  script:
+    - /kaniko/executor --context $CI_PROJECT_DIR/flickrs-server \
+      --dockerfile $CI_PROJECT_DIR/flickrs-server/Dockerfile \
+      --destination $CI_REGISTRY_IMAGE/apiserver:$CI_COMMIT_REF_SLUG \
+      --cache=true
 
 build:host:nightly:
   <<: *rust-nightly
