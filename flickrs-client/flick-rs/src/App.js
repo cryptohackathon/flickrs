@@ -38,7 +38,7 @@ class App extends React.Component {
     const requestOptions = {
       method: 'GET'
     };
-    fetch('/images', requestOptions)
+    fetch('/api/images', requestOptions)
       .then(response => response.json())
       .then(data => {
         console.log(data["images"]);
