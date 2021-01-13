@@ -3,7 +3,12 @@
 extern crate rocket;
 #[macro_use]
 extern crate rocket_contrib;
-extern crate dotenv;
+
+use std::convert::TryFrom;
+use std::env;
+use std::fs;
+use std::str::from_utf8;
+
 use cife_rs::abe::dippe::{UserPrivateKey, UserPrivateKeySlice};
 use dotenv::dotenv;
 use flickrs_sqlite::key_manager::*;
@@ -12,10 +17,6 @@ use flickrs_sqlite::*;
 use rocket::{Data, State};
 use rocket_contrib::json::Json;
 use serde::{Deserialize, Serialize};
-use std::convert::TryFrom;
-use std::env;
-use std::fs;
-use std::str::from_utf8;
 
 /// The struct needed to connect to the database
 #[database("imagesdb")]
