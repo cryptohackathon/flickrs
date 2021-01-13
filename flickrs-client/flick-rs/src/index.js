@@ -4,7 +4,7 @@ import './index.css';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { Button, Container } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 
 ReactDOM.render(
   <Container>

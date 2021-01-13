@@ -16,10 +16,10 @@ class ImageList extends React.Component {
                 return (
                     <Row className="my-3 py-3 border rounded shadow">
                         <Col xs={8}>
-                            <img src={imageUrl} alt="this is an image" className="img-fluid rounded" />
+                            <img src={imageUrl} className="img-fluid rounded" />
                         </Col>
                         <Col xs={4}>
-                            <ImageDescription></ImageDescription>
+                            <ImageDescription wasm={this.props.wasm}></ImageDescription>
                         </Col>
                     </Row>
                 );

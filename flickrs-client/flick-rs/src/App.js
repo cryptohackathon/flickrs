@@ -1,22 +1,33 @@
-import logo from './logo.svg';
 import './App.css';
 
 import React from "react";
 
-import { Col, Row } from 'react-bootstrap';
+// import { Col, Row } from 'react-bootstrap';
 import ImageList from './image_list';
+import Registration from './registration';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      isRegistered: false,
       imgs: [],
+      gid: null,
+      attrs: null,
+      registration_key: null,
+      server_key: null,
     };
 
-    this.updateImages = this.updateImages.bind(this);
+    this.onRegistration = this.onRegistration.bind(this);
+    this.getImages = this.getImages.bind(this);
   }
 
-  loadWasm = async () => {
+  componentDidMount() {
+    this.loadWasm();
+    this.serverSetup();
+  }
+
+  async loadWasm() {
     try {
       const wasm = await import('flick-rs-wasm');
       this.setState({ wasm });
@@ -25,20 +36,15 @@ class App extends React.Component {
     }
   };
 
-  updateImages(imgs) {
-    this.setState(state => ({
-      imgs: imgs,
-    }));
+  serverSetup() {
+    fetch("/api/setup", { method: "GET" })
+      .then(response => response.json())
+      .then(data => this.setState({ server_key: data["server_key"] }));
   }
 
-  componentDidMount() {
-    this.loadWasm();
-
-    // Get the images
-    const requestOptions = {
-      method: 'GET'
-    };
-    fetch('/api/images', requestOptions)
+  getImages() {
+    // Get the images, better would be one by one.
+    fetch('/api/images', { method: "GET" })
       .then(response => response.json())
       .then(data => {
         console.log(data["images"]);
@@ -46,12 +52,29 @@ class App extends React.Component {
       });
   }
 
+  /// Is called by the Registration component
+  onRegistration(gid, attrs, key) {
+    this.setState({
+      isRegistered: true,
+      gid: gid,
+      attrs: attrs,
+      registration_key: key,
+    });
+
+    // TODO: just for now to display something.
+    this.getImages();
+  }
 
   render() {
-    const { imgs } = this.state;
-    return imgs && (
-      <ImageList imgs={this.state.imgs}></ImageList>
-    );
+    console.log(this.state);
+    if (this.state.isRegistered) {
+      const { imgs } = this.state;
+      return imgs && (
+        <ImageList imgs={this.state.imgs} wasm={this.state.wasm}></ImageList>
+      );
+    } else {
+      return <Registration onRegistration={this.onRegistration}></Registration>
+    }
   }
 }
 
