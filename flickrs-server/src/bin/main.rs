@@ -5,11 +5,12 @@ extern crate rocket;
 extern crate rocket_contrib;
 extern crate dotenv;
 use dotenv::dotenv;
+use flickrs_sqlite::key_manager::*;
 use flickrs_sqlite::models::Attribute;
 use flickrs_sqlite::*;
-use rocket::Data;
+use rocket::{Data, State};
 use rocket_contrib::json::Json;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::env;
 use std::fs;
 use std::str::from_utf8;
@@ -233,6 +234,96 @@ fn api_get_get_attribute_by_name(
     })
 }
 
+/// The return value of the /<image_id> GET operation
+#[derive(Serialize, Deserialize)]
+struct RegistrationRequest {
+    gid: String,
+    attributes: Vec<i32>,
+}
+
+/// The return value of the /<image_id> GET operation
+#[derive(Serialize)]
+struct RegistrationDetails {
+    success: bool,
+    registration_key: Option<()>,
+    error: Option<String>,
+}
+
+/// Register or re-register a user with a specific global identifier.
+///
+/// This endpoint expects some honest behaviour from the requestor.
+/// Specifically, it expects that the requested GID is unique, and it doesn't validate the
+/// requested attributes.
+///
+/// ## API
+/// * Address: root/user/register
+/// * Data Needed: [`RegistrationRequest`] POST'ed as JSON: `{gid: string, attributes: [int]}`
+/// * Returns: {success: bool, registration_key: BLOB or Null, error: string or Null}
+#[post("/user/register", data = "<request>")]
+fn api_post_register_user_with_attributes(
+    connection: ImagesDbConn,
+    keys: State<KeyMaterial>,
+    request: Json<RegistrationRequest>,
+) -> Json<RegistrationDetails> {
+    let keys = keys.inner();
+
+    let db_attrs = match get_all_attributes(&*connection) {
+        Ok(attrs) => attrs,
+        Err(err) => {
+            return Json(RegistrationDetails {
+                success: false,
+                registration_key: None,
+                error: Some(format!("{}", err)),
+            })
+        }
+    };
+
+    let attr_count = db_attrs
+        .iter()
+        .map(|x| x.id)
+        .max()
+        .map(|x| x + 1)
+        .unwrap_or(0) as usize;
+    // We are the authority for every single key
+    let authorities: Vec<_> = (0..attr_count).map(|_i| &keys.public).collect();
+
+    let mut av = vec![];
+    for attr in db_attrs {
+        if request.attributes.contains(&attr.id) {
+            av.push(attr.id as usize);
+        }
+    }
+    if av.len() != request.attributes.len() {
+        return Json(RegistrationDetails {
+            success: false,
+            registration_key: None,
+            error: Some(format!(
+                "Requested {} non-existing attribute(s)",
+                request.attributes.len() - av.len()
+            )),
+        });
+    }
+    let av = keys.dippe.create_attribute_vector(attr_count, &av);
+
+    let mut upks = vec![];
+    for i in 0..attr_count {
+        let upk = keys.dippe.generate_user_private_key_part(
+            &keys.private,
+            i,
+            &authorities,
+            request.gid.as_bytes(),
+            &av,
+        );
+        upks.push(upk);
+    }
+
+    Json(RegistrationDetails {
+        success: true,
+        registration_key: Some(()),
+        error: None,
+    })
+}
+
 /// POST a new attribute by name
 ///
 /// WARNING: we reuse the UploadReturnValue for
@@ -261,8 +352,13 @@ fn api_post_new_attribute(connection: ImagesDbConn, data: Data) -> Json<UploadRe
 ///Launch the application
 fn main() {
     dotenv().ok();
+
+    let keys = KeyMaterial::load_from_storage()
+        .unwrap_or_else(|| KeyMaterial::generate_and_persist(b"flickrs", 2));
+
     rocket::ignite()
         .attach(ImagesDbConn::fairing())
+        .manage(keys)
         .mount(
             "/",
             routes![
@@ -273,6 +369,7 @@ fn main() {
                 api_get_get_attribute_by_id,
                 api_get_get_attribute_by_name,
                 api_post_new_attribute,
+                api_post_register_user_with_attributes,
             ],
         )
         .launch();

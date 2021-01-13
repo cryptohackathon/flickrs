@@ -8,6 +8,8 @@ extern crate dotenv;
 #[macro_use]
 extern crate diesel;
 
+pub mod key_manager;
+
 // Get the last inserted row
 no_arg_sql_function!(
     last_insert_rowid,
