@@ -15,3 +15,4 @@ RUN cd flick-rs && npm install && npm run build
 FROM nginx
 
 COPY --from=react-builder flick-rs/build /usr/share/nginx/html
+RUN echo "types { application/wasm wasm; }" > /etc/nginx/conf.d/wasm-mime.conf
