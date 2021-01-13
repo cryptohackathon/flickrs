@@ -48,7 +48,7 @@ build:host:nightly:docs:
   stage: build
   needs: []
   script:
-    - cargo doc --no-deps -p flickrs-client -p flickrs-server --document-private-items
+    - cargo doc --no-deps --workspace --document-private-items
   artifacts:
     paths:
       - target/doc
