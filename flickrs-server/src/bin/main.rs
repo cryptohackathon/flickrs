@@ -4,6 +4,7 @@ extern crate rocket;
 #[macro_use]
 extern crate rocket_contrib;
 extern crate dotenv;
+use cife_rs::abe::dippe::{UserPrivateKey, UserPrivateKeySlice};
 use dotenv::dotenv;
 use flickrs_sqlite::key_manager::*;
 use flickrs_sqlite::models::Attribute;
@@ -11,6 +12,7 @@ use flickrs_sqlite::*;
 use rocket::{Data, State};
 use rocket_contrib::json::Json;
 use serde::{Deserialize, Serialize};
+use std::convert::TryFrom;
 use std::env;
 use std::fs;
 use std::str::from_utf8;
@@ -245,7 +247,7 @@ struct RegistrationRequest {
 #[derive(Serialize)]
 struct RegistrationDetails {
     success: bool,
-    registration_key: Option<()>,
+    registration_key: Option<UserPrivateKey>,
     error: Option<String>,
 }
 
@@ -316,10 +318,12 @@ fn api_post_register_user_with_attributes(
         );
         upks.push(upk);
     }
+    let upk: Result<UserPrivateKeySlice, _> = upks.into_iter().collect();
+    let upk = UserPrivateKey::try_from(upk.unwrap()).unwrap();
 
     Json(RegistrationDetails {
         success: true,
-        registration_key: Some(()),
+        registration_key: Some(upk),
         error: None,
     })
 }
