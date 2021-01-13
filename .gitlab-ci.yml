@@ -54,10 +54,11 @@ build:docker:client:
   only:
     - branches
   script:
-    - /kaniko/executor --context $CI_PROJECT_DIR/flickrs-client \
-      --dockerfile $CI_PROJECT_DIR/flickrs-client/Dockerfile \
-      --destination $CI_REGISTRY_IMAGE/nginx-static:$CI_COMMIT_REF_SLUG \
-      --cache=true
+    - >
+        /kaniko/executor --context $CI_PROJECT_DIR/flickrs-client
+        --dockerfile $CI_PROJECT_DIR/flickrs-client/Dockerfile
+        --destination $CI_REGISTRY_IMAGE/nginx-static:$CI_COMMIT_REF_SLUG
+        --cache=true
 
 build:docker:apiserver:
   <<: *kaniko
@@ -65,10 +66,11 @@ build:docker:apiserver:
   only:
     - branches
   script:
-    - /kaniko/executor --context $CI_PROJECT_DIR/flickrs-server \
-      --dockerfile $CI_PROJECT_DIR/flickrs-server/Dockerfile \
-      --destination $CI_REGISTRY_IMAGE/apiserver:$CI_COMMIT_REF_SLUG \
-      --cache=true
+    - >
+        /kaniko/executor --context $CI_PROJECT_DIR/flickrs-server
+        --dockerfile $CI_PROJECT_DIR/flickrs-server/Dockerfile
+        --destination $CI_REGISTRY_IMAGE/apiserver:$CI_COMMIT_REF_SLUG
+        --cache=true
 
 build:host:nightly:
   <<: *rust-nightly
