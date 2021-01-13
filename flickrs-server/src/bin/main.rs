@@ -3,6 +3,10 @@
 extern crate rocket;
 #[macro_use]
 extern crate rocket_contrib;
+#[macro_use]
+extern crate diesel_migrations;
+
+embed_migrations!();
 
 use std::convert::TryFrom;
 use std::env;
@@ -14,7 +18,7 @@ use dotenv::dotenv;
 use flickrs_sqlite::key_manager::*;
 use flickrs_sqlite::models::Attribute;
 use flickrs_sqlite::*;
-use rocket::{Data, State};
+use rocket::{fairing::AdHoc, Data, Rocket, State};
 use rocket_contrib::json::Json;
 use serde::{Deserialize, Serialize};
 
@@ -374,6 +378,17 @@ fn api_post_new_attribute(connection: ImagesDbConn, data: Data) -> Json<UploadRe
     )
 }
 
+fn run_db_migrations(rocket: Rocket) -> Result<Rocket, Rocket> {
+    let c = ImagesDbConn::get_one(&rocket).expect("database connection");
+    match embedded_migrations::run(&*c) {
+        Ok(()) => Ok(rocket),
+        Err(e) => {
+            log::error!("Failed to run database migrations: {:?}", e);
+            Err(rocket)
+        }
+    }
+}
+
 ///Launch the application
 fn main() {
     dotenv().ok();
@@ -383,6 +398,7 @@ fn main() {
 
     rocket::ignite()
         .attach(ImagesDbConn::fairing())
+        .attach(AdHoc::on_attach("Database Migrations", run_db_migrations))
         .manage(keys)
         .mount(
             "/api/",
