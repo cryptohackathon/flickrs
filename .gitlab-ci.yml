@@ -159,6 +159,9 @@ deploy:k8s:
     - master
   before_script:
     - .ci/kube-login.sh
+  environment:
+    name: production
+    url: https://flickrs.opencloudedge.be/
   script:
     - kubectl -n $NAMESPACE apply -f flickrs-k8s.yaml
     - kubectl -n $NAMESPACE rollout restart deployment.apps/flickrs-api
