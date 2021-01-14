@@ -1,7 +1,15 @@
 table! {
+    attribute_groups (id) {
+        id -> Integer,
+        name -> Text,
+    }
+}
+
+table! {
     attributes (id) {
         id -> Integer,
         name -> Text,
+        group_id -> Nullable<Integer>,
     }
 }
 
@@ -12,4 +20,8 @@ table! {
     }
 }
 
-allow_tables_to_appear_in_same_query!(attributes, images,);
+allow_tables_to_appear_in_same_query!(
+    attribute_groups,
+    attributes,
+    images,
+);

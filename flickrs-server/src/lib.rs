@@ -1,7 +1,7 @@
 pub mod models;
 pub mod schema;
 
-use crate::models::{Attribute, Image, NewAttribute};
+use crate::models::{Attribute, Image, NewAttribute, NewAttributeGroup};
 use diesel::prelude::*;
 
 extern crate dotenv;
@@ -100,11 +100,29 @@ pub fn get_attribute_by_name(
         .first::<Attribute>(conn)
 }
 
+/// Struct to parse the new attribute JSON argument to.
+struct NewAttributeJson {
+    name: String,
+    group_id: Option<i32>,
+}
 /// Add a new attribute by name
-pub fn add_attribute(conn: &SqliteConnection, name: &str) -> Result<i32, diesel::result::Error> {
+pub fn add_attribute(conn: &SqliteConnection, name: &string, group_id: Option<&i32>) -> Result<i32, diesel::result::Error> {
     use self::schema::attributes;
     let res = diesel::insert_into(attributes::table)
-        .values(NewAttribute { name })
+        .values(NewAttribute { name, group_id })
+        .execute(conn);
+    res.map(|_| {
+        diesel::select(last_insert_rowid)
+            .get_result::<i32>(conn)
+            .unwrap()
+    })
+}
+
+/// Add a new attribute group by name
+pub fn add_attribute_group(conn: &SqliteConnection, name: &str) -> Result<i32, diesel::result::Error> {
+    use self::schema::attribute_groups;
+    let res = diesel::insert_into(attribute_groups::table)
+        .values(NewAttributeGroup { name })
         .execute(conn);
     res.map(|_| {
         diesel::select(last_insert_rowid)
