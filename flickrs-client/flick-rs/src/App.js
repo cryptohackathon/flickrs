@@ -103,7 +103,7 @@ class App extends React.Component {
     }
     return (
       <React.Fragment>
-        <div class="container-lg">
+        <div class="container-md">
           <Row className="my-3 py-3 border rounded shadow">
             <div className="py-3 col-md-6">
               {lhs}
@@ -113,9 +113,9 @@ class App extends React.Component {
             </div>
           </Row >
         </div>
-        <Container>
+        <div class="container-md">
           <ImageList imgs={this.state.imgs} wasm={this.state.wasm}></ImageList>
-        </Container>
+        </div>
       </React.Fragment>
     );
   }
