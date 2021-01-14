@@ -108,7 +108,7 @@ class App extends React.Component {
             <Col>
               {lhs}
             </Col>
-            <Col className="upload-border-left">
+            <Col>
               <Upload></Upload>
             </Col>
           </Row >

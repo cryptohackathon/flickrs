@@ -6,6 +6,8 @@ import FormFileInput from "react-bootstrap/esm/FormFileInput";
 import FormFileLabel from "react-bootstrap/esm/FormFileLabel";
 import { NotificationManager } from "react-notifications";
 
+import * as Icon from 'react-bootstrap-icons';
+
 function wait(ms) {
   var start = new Date().getTime();
   var end = start;
@@ -113,6 +115,22 @@ class Upload extends React.Component {
     return attrs && (
       <React.Fragment>
         <h1 class="text-center">Upload</h1>
+        <p>
+          Upload an image.
+          The attributes you select here, will determine who can see the uploaded picture.
+        </p>
+        <div class="bs-callout bs-callout-info">
+          <div class="media">
+            <Icon.ExclamationTriangle className="mr-3" size={64} />
+            <div class="media-body">
+              <h5 class="mt-0">Important</h5>
+              <p>
+                <span class="font-weight-bold">Don't upload any sensitive information</span>.
+                Other users who select the same attributes that are used for encrypting this image will have access to the image.
+              </p>
+            </div>
+          </div>
+        </div>
         <Form>
           <FormFileInput onChange={(event) => this.handleSelectedFile(event)}></FormFileInput>
           <br></br>
