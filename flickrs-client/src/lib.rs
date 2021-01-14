@@ -69,8 +69,7 @@ pub fn open(
     gid: &JsValue,
     bytes: &[u8],
     attributes: usize,
-    // ) -> JsValue {
-) {
+) -> JsValue {
     let dippe = Dippe::new(b"flickrs", 2);
 
     let policy = dippe.create_attribute_vector(attributes, av);
@@ -84,5 +83,5 @@ pub fn open(
 
     let open = hybrid::open(&dippe, attributes, &policy, &upk, &gid.as_bytes(), &bytes);
 
-    // JsValue::from_serde(&open).unwrap()
+    JsValue::from_serde(&open).unwrap()
 }
