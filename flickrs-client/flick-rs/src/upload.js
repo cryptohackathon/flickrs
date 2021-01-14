@@ -72,11 +72,14 @@ class Upload extends React.Component {
         return Promise.reject("server");
       }
     }).then(data => {
-      console.log(data);
+
+      this.props.getImage(data.id);
 
       NotificationManager.success("Image uploaded! 🎉", null, 5000);
 
-      this.setState({ uploading: false });
+      this.setState({ uploading: false }); //, file: null, selected_attrs: [] });
+
+
     })
   }
 
@@ -132,7 +135,7 @@ class Upload extends React.Component {
           </div>
         </div>
         <Form>
-          <FormFileInput onChange={(event) => this.handleSelectedFile(event)}></FormFileInput>
+          <FormFileInput id="form-file" onChange={(event) => this.handleSelectedFile(event)}></FormFileInput>
           <br></br>
           {
             attrs.map((e, i) => {

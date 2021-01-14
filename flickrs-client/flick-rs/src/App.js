@@ -26,6 +26,7 @@ class App extends React.Component {
 
     this.onRegistration = this.onRegistration.bind(this);
     this.getImages = this.getImages.bind(this);
+    this.getImage = this.getImage.bind(this);
   }
 
   componentDidMount() {
@@ -109,7 +110,7 @@ class App extends React.Component {
               {lhs}
             </div>
             <div className="py-3 col-md-6">
-              <Upload></Upload>
+              <Upload getImage={this.getImage}></Upload>
             </div>
           </Row >
         </div>
