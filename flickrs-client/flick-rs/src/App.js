@@ -5,6 +5,9 @@ import React from "react";
 // import { Col, Row } from 'react-bootstrap';
 import ImageList from './image_list';
 import Registration from './registration';
+import Upload from './upload';
+
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 class App extends React.Component {
   constructor(props) {
@@ -70,7 +73,10 @@ class App extends React.Component {
     if (this.state.isRegistered) {
       const { imgs } = this.state;
       return imgs && (
-        <ImageList imgs={this.state.imgs} wasm={this.state.wasm}></ImageList>
+        <div>
+          <Upload></Upload>
+          <ImageList imgs={this.state.imgs} wasm={this.state.wasm}></ImageList>
+        </div>
       );
     } else {
       return <Registration onRegistration={this.onRegistration}></Registration>
