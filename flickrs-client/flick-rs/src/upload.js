@@ -1,5 +1,5 @@
 import React from "react";
-import { Row, Col, FormFile, Form, Button, FormCheck } from "react-bootstrap";
+import { Row, Col, Form, Button, FormCheck } from "react-bootstrap";
 import FormCheckInput from "react-bootstrap/esm/FormCheckInput";
 import FormCheckLabel from "react-bootstrap/esm/FormCheckLabel";
 import FormFileInput from "react-bootstrap/esm/FormFileInput";
@@ -37,14 +37,18 @@ class Upload extends React.Component {
   }
 
   handleUpload(event) {
-    console.log(this.state.selected_attrs);
+    if (this.state.file === null) {
+      console.log("Don't upload null");
+      return;
+    }
+
     fetch("/api/upload", {
       method: "POST",
-      body: this.state.file,
+      body: new Blob([this.state.file], { type: this.state.file.type }),
     }).then(resp => {
       if (resp.status === 200) {
         return resp.json();
-      } {
+      } else {
         console.log("Status: " + resp.status);
         return Promise.reject("server");
       }

@@ -55,6 +55,7 @@ class App extends React.Component {
       })
       .then(data => {
         console.log(data["image"]);
+
         this.setState(state => {
           state.imgs.push(data["image"]);
           const imgs = state.imgs;
