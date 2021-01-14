@@ -1,4 +1,4 @@
 target
-data/*
+data/images/*
 flickrs.db
 ../.idea/

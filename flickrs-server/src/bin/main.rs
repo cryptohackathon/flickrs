@@ -18,11 +18,9 @@ use dotenv::dotenv;
 use flickrs_sqlite::key_manager::*;
 use flickrs_sqlite::models::Attribute;
 use flickrs_sqlite::*;
-use rocket::{fairing::AdHoc, Data, Rocket, State, Request, data};
+use rocket::{fairing::AdHoc, Data, Rocket, State};
 use rocket_contrib::json::Json;
 use serde::{Deserialize, Serialize};
-use std::io::Read;
-use rocket::outcome::Outcome::{Failure, Success};
 
 /// The struct needed to connect to the database
 #[database("imagesdb")]
@@ -178,30 +176,6 @@ fn api_post_upload_image(connection: ImagesDbConn, data: Data) -> Json<UploadRet
     Json(
         match set_image_path(&*connection, &id, filename.to_str().unwrap()) {
             Ok(_) => UploadReturnValue {
-                success: true,
-                id: Some(id),
-                error: None,
-            },
-            Err(e) => UploadReturnValue {
-                success: false,
-                id: None,
-                error: Some(e.to_string()),
-            },
-        },
-    )
-}
-/// POST a new attribute group
-///
-/// WARNING: we reuse the UploadReturnValue
-///
-/// * Address: root/groups/new
-/// * Data Needed: String containing the new id
-/// * Returns: {success: bool, id: int or NULL, error: string or Null}
-#[post("/groups/new", data = "<data>")]
-fn api_post_new_group(connection: ImagesDbConn, data: Data) -> Json<UploadReturnValue> {
-    Json(
-        match add_attribute_group(&*connection, from_utf8(data.peek()).unwrap()) {
-            Ok(id) => UploadReturnValue {
                 success: true,
                 id: Some(id),
                 error: None,
@@ -415,15 +389,15 @@ fn api_post_register_user_with_attributes(
 
 /// POST a new attribute by name
 ///
-/// WARNING: we reuse the UploadReturnValue
+/// WARNING: we reuse the UploadReturnValue for
 ///
 /// * Address: root/attributes/new
-/// * Data Needed: {name: string, group_id: int or Null}
+/// * Data Needed: String containing the new name
 /// * Returns: {success: bool, id: int or NULL, error: string or Null}
-#[post("/attributes/new", format = "json", data = "<data>")]
-fn api_post_new_attribute(connection: ImagesDbConn, data: ???????????) -> Json<UploadReturnValue> {
+#[post("/attributes/new", data = "<data>")]
+fn api_post_new_attribute(connection: ImagesDbConn, data: Data) -> Json<UploadReturnValue> {
     Json(
-        match add_attribute(&*connection, data.name, data.group_id) {
+        match add_attribute(&*connection, from_utf8(data.peek()).unwrap()) {
             Ok(id) => UploadReturnValue {
                 success: true,
                 id: Some(id),
@@ -452,6 +426,7 @@ fn run_db_migrations(rocket: Rocket) -> Result<Rocket, Rocket> {
 ///Launch the application
 fn main() {
     dotenv().ok();
+
     let keys = KeyMaterial::load_from_storage(b"flickrs", 2)
         .unwrap_or_else(|| KeyMaterial::generate_and_persist(b"flickrs", 2));
 
