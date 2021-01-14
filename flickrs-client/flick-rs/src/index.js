@@ -9,11 +9,11 @@ import { Container } from 'react-bootstrap';
 import NotificationContainer from 'react-notifications/lib/NotificationContainer';
 
 ReactDOM.render(
-  <Container>
+  <React.Fragment>
     <App />
     <NotificationContainer>
     </NotificationContainer>
-  </Container >,
+  </React.Fragment>,
   document.getElementById('root')
 );
 

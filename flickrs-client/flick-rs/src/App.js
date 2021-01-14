@@ -103,16 +103,16 @@ class App extends React.Component {
     }
     return (
       <React.Fragment>
-        <Container>
+        <div class="container-lg">
           <Row className="my-3 py-3 border rounded shadow">
-            <Col className="py-3">
+            <div className="py-3 col-md-6">
               {lhs}
-            </Col>
-            <Col className="py-3">
+            </div>
+            <div className="py-3 col-md-6">
               <Upload></Upload>
-            </Col>
+            </div>
           </Row >
-        </Container>
+        </div>
         <Container>
           <ImageList imgs={this.state.imgs} wasm={this.state.wasm}></ImageList>
         </Container>
