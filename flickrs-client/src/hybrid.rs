@@ -1,6 +1,7 @@
+use chacha20poly1305::aead::{Aead, NewAead};
+use chacha20poly1305::{ChaCha20Poly1305, Key, Nonce}; // Or `XChaCha20Poly1305`
 use cife_rs::abe::dippe::*;
 use rand::*;
-use ring::aead::{Aad, LessSafeKey, Nonce, UnboundKey, CHACHA20_POLY1305};
 use tiny_keccak::{Hasher, Sha3};
 
 /// Takes a byte string and encrypts and authenticates it for storage on the flick-rs server.
@@ -23,10 +24,10 @@ pub fn seal<R: RngCore + CryptoRng>(
         sealing_key_bytes
     };
 
-    let sealing_key = UnboundKey::new(&CHACHA20_POLY1305, &sealing_key).unwrap();
+    let sealing_key = Key::from_slice(&sealing_key);
     // We don't have nonce reuse, we can use LessSafeKey.
-    let nonce = Nonce::assume_unique_for_key([0u8; 12]);
-    let sealing_key = LessSafeKey::new(sealing_key);
+    let nonce = Nonce::from_slice(&[0u8; 12]);
+    let cipher = ChaCha20Poly1305::new(sealing_key);
 
     // Format: 64 bytes for the padded encryption key as Gt element,
     //         + cipher text
@@ -38,18 +39,13 @@ pub fn seal<R: RngCore + CryptoRng>(
     let encrypted_sealing_key_gt = dippe.encrypt(rng, &ep, sealing_key_gt, &pks);
     let ciphertext_len = encrypted_sealing_key_gt.bytes_len();
 
-    let mut output = vec![0u8; ciphertext_len + bytes.len() + CHACHA20_POLY1305.tag_len()];
+    let mut output = vec![0u8; ciphertext_len + bytes.len() + 16];
     output[..ciphertext_len].clone_from_slice(&encrypted_sealing_key_gt.into_bytes());
 
-    let buf = &mut output[ciphertext_len..];
     // Then, the symmetric encryption
-    let mut text = &mut buf[..bytes.len()];
-    text.clone_from_slice(bytes);
-    let tag = sealing_key
-        .seal_in_place_separate_tag(nonce, Aad::empty(), &mut text)
-        .unwrap();
-    drop(text);
-    buf[bytes.len()..].clone_from_slice(tag.as_ref());
+    let ciphertext = cipher.encrypt(nonce, bytes).unwrap();
+    println!("c: {}, output: {}", ciphertext.len(), output.len());
+    output[ciphertext_len..].clone_from_slice(&ciphertext);
 
     output
 }
@@ -80,19 +76,12 @@ pub fn open(
     };
 
     // Symmetric decrypt
-    let sealing_key = UnboundKey::new(&CHACHA20_POLY1305, &sealing_key).unwrap();
+    let sealing_key = Key::from_slice(&sealing_key);
     // We don't have nonce reuse, we can use LessSafeKey.
-    let nonce = Nonce::assume_unique_for_key([0u8; 12]);
-    let sealing_key = LessSafeKey::new(sealing_key);
+    let nonce = Nonce::from_slice(&[0u8; 12]);
+    let cipher = ChaCha20Poly1305::new(sealing_key);
 
-    let mut result = Vec::from(ciphertext);
-    let res = sealing_key
-        .open_in_place(nonce, Aad::empty(), &mut result)
-        .ok()?;
-    let len = res.len();
-    result.truncate(len);
-
-    Some(result)
+    cipher.decrypt(nonce, ciphertext.as_ref()).ok()
 }
 
 #[cfg(test)]

@@ -4,7 +4,7 @@ use wasm_bindgen::prelude::*;
 
 use cife_rs::abe::dippe::*;
 
-mod hybrid;
+pub mod hybrid;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
