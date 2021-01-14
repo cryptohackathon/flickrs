@@ -49,27 +49,36 @@ class Upload extends React.Component {
     console.log("Selected attrs: " + selected_attrs);
     console.log("Total attrs: " + total_attrs);
 
-    let blob = JSON.stringify({
-      img: new Blob([this.state.file],
-        { type: this.state.file.type }),
-      description: "this is a description"
-    });
+    let reader = new FileReader();
+    reader.readAsArrayBuffer(this.state.file);
+    let thiz = this;
+    reader.onload = function(evt) {
+      console.log(evt.target.result);
+      let blob = JSON.stringify({
+        img: Array.from(new Uint8Array(evt.target.result)),
+        type: thiz.state.file.type,
+        description: "this is a description"
+      });
 
-    blob = wasm.seal(server_key, blob, selected_attrs, total_attrs);
+      blob = wasm.seal(server_key, blob, selected_attrs, total_attrs);
 
-    fetch("/api/upload", {
-      method: "POST",
-      body: blob,
-    }).then(resp => {
-      if (resp.status === 200) {
-        return resp.json();
-      } else {
-        console.log("Status: " + resp.status);
-        return Promise.reject("server");
-      }
-    }).then(data => {
-      console.log(data);
-    })
+      fetch("/api/upload", {
+        method: "POST",
+        body: blob,
+      }).then(resp => {
+        if (resp.status === 200) {
+          return resp.json();
+        } else {
+          console.log("Status: " + resp.status);
+          return Promise.reject("server");
+        }
+      }).then(data => {
+        console.log(data);
+      })
+    };
+    reader.onerror = function(evt) {
+      // XXX
+    }
   }
 
   handleChecked(event) {
