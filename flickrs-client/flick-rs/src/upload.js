@@ -83,27 +83,25 @@ class Upload extends React.Component {
   render() {
     const { attrs } = this.state;
     return attrs && (
-      <Row className="my-3 py-3 border rounded shadow">
-        <Col>
-          <h1 class="text-center">Upload</h1>
-          <Form>
-            <FormFileInput onChange={(event) => this.handleSelectedFile(event)}></FormFileInput>
-            <br></br>
-            {
-              attrs.map((e, i) => {
-                return (
-                  <FormCheck className="form-check-inline">
-                    <FormCheckInput value={attrs[i].id}
-                      onChange={(event) => this.handleChecked(event)}></FormCheckInput>
-                    <FormCheckLabel>{attrs[i].name}</FormCheckLabel>
-                  </FormCheck>);
-              })
-            }
-            <br></br>
-            <Button onClick={(event) => this.handleUpload(event)}>Upload</Button>
-          </Form>
-        </Col>
-      </Row>
+      <React.Fragment>
+        <h1 class="text-center">Upload</h1>
+        <Form>
+          <FormFileInput onChange={(event) => this.handleSelectedFile(event)}></FormFileInput>
+          <br></br>
+          {
+            attrs.map((e, i) => {
+              return (
+                <FormCheck className="form-check-inline">
+                  <FormCheckInput value={attrs[i].id}
+                    onChange={(event) => this.handleChecked(event)}></FormCheckInput>
+                  <FormCheckLabel>{attrs[i].name}</FormCheckLabel>
+                </FormCheck>);
+            })
+          }
+          <br></br>
+          <Button onClick={(event) => this.handleUpload(event)}>Upload</Button>
+        </Form>
+      </React.Fragment>
     );
   }
 }

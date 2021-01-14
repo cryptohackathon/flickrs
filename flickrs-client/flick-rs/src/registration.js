@@ -1,4 +1,5 @@
 import React from "react";
+import * as Icon from 'react-bootstrap-icons';
 
 import { Button, Col, Form, FormCheck, Row } from 'react-bootstrap';
 import FormCheckInput from "react-bootstrap/esm/FormCheckInput";
@@ -80,29 +81,40 @@ class Registration extends React.Component {
   render() {
     const { attrs } = this.state;
     return attrs && (
-    <React.Fragment>
-      <Row className="my-3 py-3 border rounded shadow">
-        <Col>
-          <h1 class="text-center">Search</h1>
-          <p>
-            Select a combination of categories you are interested in.
-          </p>
-          <Form>
-            {
-              attrs.map((e, i) => {
-                return (
-                  <FormCheck className="form-check-inline">
-                    <FormCheckInput value={attrs[i].id}
-                      onChange={(event) => this.handleChecked(event)}></FormCheckInput>
-                    <FormCheckLabel>{attrs[i].name}</FormCheckLabel>
-                  </FormCheck>);
-              })
-            }
-            <br></br>
-            <Button onClick={(event) => this.handleRegistration(event)}>Continue</Button>
-          </Form>
-        </Col>
-      </Row >
+      <React.Fragment>
+        <h1 class="text-center">Registration</h1>
+        <p>
+          Register your profile.
+          The attributes you select here, will determine the pictures you can see.
+        </p>
+        <div class="bs-callout bs-callout-info">
+          <div class="media">
+            <Icon.ShieldCheck className="mr-3" size={64} />
+            <div class="media-body">
+              <h5 class="mt-0">Security information</h5>
+              <p>
+                The attributes you select here, will be sent to the server.
+                The server is the <span class="font-weight-bold">single authority</span>,
+                and will return your decryption key.
+                In a real deployment of this ABE scheme, there can be multiple distinct authorities.
+              </p>
+            </div>
+          </div>
+        </div>
+        <Form>
+          {
+            attrs.map((e, i) => {
+              return (
+                <FormCheck className="form-check-inline">
+                  <FormCheckInput value={attrs[i].id}
+                    onChange={(event) => this.handleChecked(event)}></FormCheckInput>
+                  <FormCheckLabel>{attrs[i].name}</FormCheckLabel>
+                </FormCheck>);
+            })
+          }
+          <br></br>
+          <Button onClick={(event) => this.handleRegistration(event)}>Continue</Button>
+        </Form>
       </React.Fragment>
     );
   }

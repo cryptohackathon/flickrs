@@ -1,12 +1,14 @@
 import './App.css';
 
 import React from "react";
+import * as Icon from 'react-bootstrap-icons';
 
 // import { Col, Row } from 'react-bootstrap';
 import ImageList from './image_list';
 import Registration from './registration';
+import Profile from './profile';
 import Upload from './upload';
-import { Col, Row } from 'react-bootstrap';
+import { Container, Col, Row } from 'react-bootstrap';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -93,22 +95,27 @@ class App extends React.Component {
 
   render() {
     console.log(this.state);
+    let lhs;
     if (this.state.isRegistered) {
-      const { imgs } = this.state;
-      return imgs && (
-        <React.Fragment>
-          <Upload></Upload>
-          <ImageList imgs={this.state.imgs} wasm={this.state.wasm}></ImageList>
-        </React.Fragment>
-      );
+      lhs = <Profile gid={this.state.gid} attrs={this.state.attrs}></Profile>;
     } else {
-      return (
-        <React.Fragment>
-          <Registration onRegistration={this.onRegistration}></Registration>
-          <Upload></Upload>
-        </React.Fragment>
-      );
+      lhs = <Registration onRegistration={this.onRegistration}></Registration>;
     }
+    return (
+      <React.Fragment>
+        <Container>
+          <Row className="my-3 py-3 border rounded shadow">
+            <Col>
+              { lhs }
+            </Col>
+            <Col>
+              <Upload></Upload>
+            </Col>
+          </Row >
+        </Container>
+        <ImageList imgs={this.state.imgs} wasm={this.state.wasm}></ImageList>
+      </React.Fragment>
+    );
   }
 }
 
