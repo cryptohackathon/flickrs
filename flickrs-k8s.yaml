@@ -50,6 +50,8 @@ spec:
         env:
         - name: RUST_BACKTRACE
           value: "1"
+        - name: IMAGE_BASE_URL
+          value: /var/lib/flickrs/images
         - name: RUST_LOG
           value: debug
         - name: ROCKET_DATABASES
