@@ -116,6 +116,37 @@ fn api_get_all_images(connection: ImagesDbConn) -> Json<GetImagesReturnValue> {
     })
 }
 
+/// The return value of the /images_list GET operation
+#[derive(Serialize)]
+struct GetImageIdsReturnValue {
+    success: bool,
+    ids: Option<Vec<i32>>,
+    error: Option<String>,
+}
+/// GET all images
+///
+/// ## API
+/// * Address: root/images
+/// * Data Needed: None
+/// * Returns: {success: bool, image: List<Byte vector> or Null, error: String or Null}
+#[get("/images_list")]
+fn api_get_all_image_ids(connection: ImagesDbConn) -> Json<GetImageIdsReturnValue> {
+    let ids = get_all_image_ids(&*connection);
+    if ids.is_err() {
+        return Json(GetImageIdsReturnValue {
+            success: false,
+            ids: None,
+            error: ids.err().map(|e| e.to_string()),
+        });
+    }
+    let ids = ids.unwrap();
+    Json(GetImageIdsReturnValue {
+        success: true,
+        ids: Some(ids),
+        error: None,
+    })
+}
+
 /// The return value from the /upload POST operation
 #[derive(Serialize)]
 struct UploadReturnValue {
@@ -406,6 +437,7 @@ fn main() {
                 api_get_get_image,
                 api_post_upload_image,
                 api_get_all_images,
+                api_get_all_image_ids,
                 api_get_all_attributes,
                 api_get_get_attribute_by_id,
                 api_get_get_attribute_by_name,

@@ -52,6 +52,12 @@ pub fn get_image_row(
     images.filter(id.eq(image_id)).first::<Image>(conn)
 }
 
+/// Get all image ids
+pub fn get_all_image_ids(conn: &SqliteConnection) -> Result<Vec<i32>, diesel::result::Error> {
+    use self::schema::images::dsl::{id, images};
+    images.select(id).load(conn)
+}
+
 /// Get all attributes
 pub fn get_all_image_paths(
     conn: &SqliteConnection,
