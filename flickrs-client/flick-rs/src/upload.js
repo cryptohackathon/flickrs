@@ -64,7 +64,7 @@ class Upload extends React.Component {
 
       fetch("/api/upload", {
         method: "POST",
-        body: blob,
+        body: new File([new Uint8Array(blob)], "contents"),
       }).then(resp => {
         if (resp.status === 200) {
           return resp.json();
