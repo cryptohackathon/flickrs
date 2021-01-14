@@ -54,7 +54,6 @@ class Registration extends React.Component {
         return Promise.reject("server")
       }
     }).then(data => {
-      console.log(data);
       this.props.onRegistration(this.state.gid, this.state.selected_attrs, data.registration_key);
     });
 

@@ -27,14 +27,12 @@ class Upload extends React.Component {
     fetch("/api/attributes", { method: "GET" })
       .then(response => response.json())
       .then(data => {
-        console.log(data);
         this.setState({ attrs: data["attributes"] })
       });
   }
 
 
   handleSelectedFile(event) {
-    console.log(event.target.files[0]);
     this.setState({
       file: event.target.files[0],
     });
@@ -60,7 +58,6 @@ class Upload extends React.Component {
     reader.readAsArrayBuffer(this.state.file);
     let thiz = this;
     reader.onload = function (evt) {
-      console.log(evt.target.result);
       let blob = JSON.stringify({
         img: Array.from(new Uint8Array(evt.target.result)),
         type: thiz.state.file.type,
