@@ -23,7 +23,6 @@ class Registration extends React.Component {
     fetch("/api/attributes", { method: "GET" })
       .then(response => response.json())
       .then(data => {
-        console.log(data);
         this.setState({ attrs: data["attributes"] })
       });
   }

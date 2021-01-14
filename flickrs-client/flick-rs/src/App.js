@@ -62,16 +62,11 @@ class App extends React.Component {
   }
 
   getImage(id) {
-    const api_str = "/api/" + id;
-    console.log(api_str);
-    fetch(api_str, { method: "GET" })
+    fetch("/api/" + id, { method: "GET" })
       .then(response => {
-        console.log(response);
         return response.json();
       })
       .then(data => {
-        console.log(data["image"]);
-
         this.setState(state => {
           state.imgs.push(data["image"]);
           const imgs = state.imgs;
@@ -107,7 +102,6 @@ class App extends React.Component {
   }
 
   render() {
-    console.log(this.state);
     let lhs;
     if (this.state.isRegistered) {
       lhs = <Profile gid={this.state.gid} attrs={this.state.interested_attrs}></Profile>;
