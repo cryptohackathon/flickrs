@@ -6,6 +6,8 @@ import FormCheckInput from "react-bootstrap/esm/FormCheckInput";
 import FormCheckLabel from "react-bootstrap/esm/FormCheckLabel";
 import { v4 as uuidv4 } from 'uuid';
 
+import { NotificationManager } from 'react-notifications';
+
 class Registration extends React.Component {
   constructor(props) {
     super(props);
@@ -27,9 +29,13 @@ class Registration extends React.Component {
   }
 
   handleRegistration(event) {
-    //Do the registration.
 
     const attrs = this.state.selected_attrs.map(x => parseInt(x));
+
+    if (attrs.length === 0) {
+      NotificationManager.warning('Please select at least one attribute', null, 5000);
+      return;
+    }
 
     const data = JSON.stringify({ gid: this.state.gid, attributes: attrs });
 
@@ -113,7 +119,7 @@ class Registration extends React.Component {
             })
           }
           <br></br>
-          <Button onClick={(event) => this.handleRegistration(event)}>Continue</Button>
+          <Button onClick={(event) => this.handleRegistration(event)}>Select attributes</Button>
         </Form>
       </React.Fragment>
     );
