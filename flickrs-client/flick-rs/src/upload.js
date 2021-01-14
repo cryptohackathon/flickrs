@@ -4,6 +4,7 @@ import FormCheckInput from "react-bootstrap/esm/FormCheckInput";
 import FormCheckLabel from "react-bootstrap/esm/FormCheckLabel";
 import FormFileInput from "react-bootstrap/esm/FormFileInput";
 import FormFileLabel from "react-bootstrap/esm/FormFileLabel";
+import { NotificationManager } from "react-notifications";
 
 class Upload extends React.Component {
   constructor(props) {
@@ -38,7 +39,12 @@ class Upload extends React.Component {
 
   handleUpload(event) {
     if (this.state.file === null) {
-      console.log("Don't upload null");
+      NotificationManager.warning('Please select an image before uploading', null, 5000);
+      return;
+    }
+
+    if (this.state.selected_attrs.length === 0) {
+      NotificationManager.warning('Please select one or more attributes before uploading', null, 5000);
       return;
     }
 
