@@ -7,7 +7,6 @@ class ImageList extends React.Component {
   render() {
     return this.props.imgs && (
       this.props.imgs.map((e, i) => {
-
         let arrayBufferView = new Uint8Array(this.props.imgs[i]);
         let blob = new Blob([arrayBufferView]);
         let urlCreator = window.URL || window.webkitURL;

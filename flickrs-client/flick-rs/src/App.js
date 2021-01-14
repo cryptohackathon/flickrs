@@ -18,8 +18,10 @@ class App extends React.Component {
       imgs: [],
       gid: null,
       attrs: null,
+      selected_attrs: [],
       registration_key: null,
       server_key: null,
+      total_attrs: null,
     };
 
     this.onRegistration = this.onRegistration.bind(this);
@@ -29,6 +31,7 @@ class App extends React.Component {
   componentDidMount() {
     this.loadWasm();
     this.serverSetup();
+    this.loadAttrs();
   }
 
   async loadWasm() {
@@ -44,6 +47,14 @@ class App extends React.Component {
     fetch("/api/setup", { method: "GET" })
       .then(response => response.json())
       .then(data => this.setState({ server_key: data["server_key"] }));
+  }
+
+  loadAttrs() {
+    fetch("/api/attributes", { method: "GET" })
+      .then(response => response.json())
+      .then(data => {
+        this.setState({ total_attrs: data["attributes"].length })
+      });
   }
 
   getImage(id) {
@@ -105,7 +116,7 @@ class App extends React.Component {
       return (
         <React.Fragment>
           <Registration onRegistration={this.onRegistration}></Registration>
-          <Upload></Upload>
+          <Upload wasm={this.state.wasm} server_key={this.state.server_key} selected_attrs={this.state.selected_attrs} total_attrs={this.state.total_attrs}></Upload>
         </React.Fragment>
       );
     }

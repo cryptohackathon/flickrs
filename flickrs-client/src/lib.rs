@@ -32,3 +32,52 @@ pub fn end_to_end_conjunction() {
 pub fn get_image_title() -> String {
     "Hello from Rust".into()
 }
+
+#[wasm_bindgen]
+pub fn seal(
+    server_key: &JsValue,
+    bytes: &JsValue,
+    selected_attrs: &JsValue,
+    attributes: &JsValue,
+) -> JsValue {
+    let dippe = Dippe::new(b"flickrs", 2);
+
+    let authority: PublicKey = server_key.into_serde().unwrap();
+    let bytes: String = bytes.into_serde().unwrap();
+    let selected_attrs: Vec<usize> = selected_attrs.into_serde().unwrap();
+    let attributes: usize = attributes.into_serde().unwrap();
+
+    let mut rng = rand::thread_rng();
+
+    let sealed = hybrid::seal(
+        &mut rng,
+        &dippe,
+        &authority,
+        &bytes.as_bytes(),
+        &selected_attrs,
+        attributes,
+    );
+
+    JsValue::from_serde(&sealed).unwrap()
+}
+
+#[wasm_bindgen]
+pub fn open(
+    upk: &JsValue,
+    av: &JsValue,
+    gid: &JsValue,
+    bytes: &JsValue,
+    attributes: &JsValue,
+) -> JsValue {
+    let dippe = Dippe::new(b"flickrs", 2);
+
+    let av: AttributeVector = av.into_serde().unwrap();
+    let upk: UserPrivateKey = upk.into_serde().unwrap();
+    let gid: Vec<u8> = gid.into_serde().unwrap();
+    let attributes: usize = attributes.into_serde().unwrap();
+    let sealed: Vec<u8> = bytes.into_serde().unwrap();
+
+    let open = hybrid::open(&dippe, attributes, &av, &upk, &gid, &sealed);
+
+    JsValue::from_serde(&open).unwrap()
+}

@@ -42,9 +42,19 @@ class Upload extends React.Component {
       return;
     }
 
+    const { wasm, server_key, selected_attrs, total_attrs } = this.props;
+
+    let blob = JSON.stringify({
+      img: new Blob([this.state.file],
+        { type: this.state.file.type }),
+      description: "this is a description"
+    });
+
+    blob = wasm.seal(server_key, blob, selected_attrs, total_attrs);
+
     fetch("/api/upload", {
       method: "POST",
-      body: new Blob([this.state.file], { type: this.state.file.type }),
+      body: blob,
     }).then(resp => {
       if (resp.status === 200) {
         return resp.json();
