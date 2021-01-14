@@ -4,6 +4,8 @@ version = "0.1.0"
 authors = ["Thibaut Vandervelden <thvdveld@vub.be>"]
 edition = "2018"
 
+wasm-opt = false
+
 [lib]
 crate-type = ["cdylib", "rlib"]
 
@@ -11,7 +13,7 @@ crate-type = ["cdylib", "rlib"]
 default = ["console_error_panic_hook"]
 
 [dependencies]
-wasm-bindgen = "0.2.63"
+wasm-bindgen = { version = "0.2.63", features = ["serde-serialize"] }
 
 cife-rs = { version = "0.1.0", git = "https://github.com/cryptohackathon/cife-rs" }
 rand = { version = "0.7", features = ["wasm-bindgen"] }
@@ -39,5 +41,5 @@ wasm-bindgen-test = "0.3.13"
 opt-level = "s"
 
 # This is needed because there is some bug...
-[package.metadata.wasm-pack.profile.release]
-wasm-opt = ["-Oz", "--enable-mutable-globals"]
+# [package.metadata.wasm-pack.profile.release]
+# wasm-opt = ["-Oz", "--enable-mutable-globals"]
