@@ -1,5 +1,5 @@
 import React from "react";
-import { Row, Col, Form, Button, FormCheck } from "react-bootstrap";
+import { Row, Col, Form, Button, FormCheck, Badge } from "react-bootstrap";
 import FormCheckInput from "react-bootstrap/esm/FormCheckInput";
 import FormCheckLabel from "react-bootstrap/esm/FormCheckLabel";
 import FormFileInput from "react-bootstrap/esm/FormFileInput";
@@ -94,10 +94,13 @@ class Upload extends React.Component {
                 <FormCheck className="form-check-inline">
                   <FormCheckInput value={attrs[i].id}
                     onChange={(event) => this.handleChecked(event)}></FormCheckInput>
-                  <FormCheckLabel>{attrs[i].name}</FormCheckLabel>
+                  <FormCheckLabel>
+                    <Badge className="bg-secondary text-white mr-1 p-1">{attrs[i].name}</Badge>
+                  </FormCheckLabel>
                 </FormCheck>);
             })
           }
+          <br></br>
           <br></br>
           <Button onClick={(event) => this.handleUpload(event)}>Upload</Button>
         </Form>
