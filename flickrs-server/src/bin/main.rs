@@ -427,7 +427,7 @@ fn run_db_migrations(rocket: Rocket) -> Result<Rocket, Rocket> {
 fn main() {
     dotenv().ok();
 
-    let keys = KeyMaterial::load_from_storage()
+    let keys = KeyMaterial::load_from_storage(b"flickrs", 2)
         .unwrap_or_else(|| KeyMaterial::generate_and_persist(b"flickrs", 2));
 
     rocket::ignite()

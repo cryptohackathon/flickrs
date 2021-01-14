@@ -64,6 +64,8 @@ spec:
           value: "1"
         - name: IMAGE_BASE_URL
           value: /var/lib/flickrs/images/
+        - name: KEY_STORE_PATH
+          value: /var/lib/flickrs/keys/
         - name: RUST_LOG
           value: debug
         - name: ROCKET_DATABASES
