@@ -25,12 +25,14 @@ class ImageList extends React.Component {
           let imageUrl = urlCreator.createObjectURL(blob);
 
           return (
+          <Col className="col-lg-4 col-md-6">
             <Card className="my-3 shadow">
               <img src={imageUrl} className="card-img-top" />
               <div class="card-body">
                 {data.descirption}
               </div>
             </Card>
+          </Col>
           );
         }
       })

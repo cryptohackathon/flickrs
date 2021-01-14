@@ -150,14 +150,16 @@ class App extends React.Component {
           </Row >
         </div>
         <div class="container-md">
-          <ImageList
-            wasm={wasm}
-            upk={registration_key}
-            av={interested_attrs}
-            gid={gid}
-            attributes={total_attrs}
-            imgs={imgs}
-          ></ImageList>
+          <Row>
+            <ImageList
+              wasm={wasm}
+              upk={registration_key}
+              av={interested_attrs}
+              gid={gid}
+              attributes={total_attrs}
+              imgs={imgs}
+            ></ImageList>
+          </Row>
         </div>
       </React.Fragment>
     );
