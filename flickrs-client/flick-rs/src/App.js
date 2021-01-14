@@ -105,10 +105,10 @@ class App extends React.Component {
       <React.Fragment>
         <Container>
           <Row className="my-3 py-3 border rounded shadow">
-            <Col>
+            <Col className="py-3">
               {lhs}
             </Col>
-            <Col>
+            <Col className="py-3">
               <Upload></Upload>
             </Col>
           </Row >
