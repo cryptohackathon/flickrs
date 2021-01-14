@@ -44,7 +44,6 @@ pub fn seal<R: RngCore + CryptoRng>(
 
     // Then, the symmetric encryption
     let ciphertext = cipher.encrypt(nonce, bytes).unwrap();
-    println!("c: {}, output: {}", ciphertext.len(), output.len());
     output[ciphertext_len..].clone_from_slice(&ciphertext);
 
     output

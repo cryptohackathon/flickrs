@@ -59,28 +59,44 @@ class Upload extends React.Component {
       return;
     }
 
+    const { wasm, server_key, total_attrs } = this.props;
+    const selected_attrs = this.state.selected_attrs.map(x => parseInt(x) - 1);
+
     this.setState({ uploading: true });
 
-    fetch("/api/upload", {
-      method: "POST",
-      body: new Blob([this.state.file], { type: this.state.file.type }),
-    }).then(resp => {
-      if (resp.status === 200) {
-        return resp.json();
-      } else {
-        console.log("Status: " + resp.status);
-        return Promise.reject("server");
-      }
-    }).then(data => {
+    let reader = new FileReader();
+    reader.readAsArrayBuffer(this.state.file);
+    let thiz = this;
+    reader.onload = function (evt) {
+      console.log(evt.target.result);
+      let blob = JSON.stringify({
+        img: Array.from(new Uint8Array(evt.target.result)),
+        type: thiz.state.file.type,
+        description: "this is a description"
+      });
 
-      this.props.getImage(data.id);
+      blob = wasm.seal(server_key, blob, selected_attrs, total_attrs);
 
-      NotificationManager.success("Image uploaded! 🎉", null, 5000);
+      fetch("/api/upload", {
+        method: "POST",
+        body: new File([new Uint8Array(blob)], "contents"),
+      }).then(resp => {
+        if (resp.status === 200) {
+          return resp.json();
+        } else {
+          console.log("Status: " + resp.status);
+          return Promise.reject("server");
+        }
+      }).then(data => {
 
-      this.setState({ uploading: false }); //, file: null, selected_attrs: [] });
+        NotificationManager.success("Image uploaded! 🎉", null, 5000);
 
-
-    })
+        thiz.setState({ uploading: false }); //, file: null, selected_attrs: [] });
+      })
+    };
+    reader.onerror = function (evt) {
+      // XXX
+    }
   }
 
   handleChecked(event) {

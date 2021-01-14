@@ -13,8 +13,7 @@ class Profile extends React.Component {
 
   componentDidMount() {
     this.props.attrs.forEach(i => {
-      fetch("/api/attributes/" + i).then(data => data.json()).then(name => {
-        console.log(name["attribute"]);
+      fetch("/api/attributes/" + (i + 1)).then(data => data.json()).then(name => {
         this.setState(state => {
           let { attribute_names } = state;
           attribute_names.push(name["attribute"].name);

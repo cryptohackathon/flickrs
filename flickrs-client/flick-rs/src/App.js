@@ -18,10 +18,14 @@ class App extends React.Component {
     this.state = {
       isRegistered: false,
       imgs: [],
+      wasm: null,
       gid: null,
-      attrs: null,
+      attrs: [],
+      selected_attrs: [],
+      interested_attrs: [],
       registration_key: null,
       server_key: null,
+      total_attrs: null,
     };
 
     this.onRegistration = this.onRegistration.bind(this);
@@ -32,6 +36,7 @@ class App extends React.Component {
   componentDidMount() {
     this.loadWasm();
     this.serverSetup();
+    this.loadAttrs();
   }
 
   async loadWasm() {
@@ -47,6 +52,14 @@ class App extends React.Component {
     fetch("/api/setup", { method: "GET" })
       .then(response => response.json())
       .then(data => this.setState({ server_key: data["server_key"] }));
+  }
+
+  loadAttrs() {
+    fetch("/api/attributes", { method: "GET" })
+      .then(response => response.json())
+      .then(data => {
+        this.setState({ total_attrs: data["attributes"].length })
+      });
   }
 
   getImage(id) {
@@ -86,7 +99,7 @@ class App extends React.Component {
     this.setState({
       isRegistered: true,
       gid: gid,
-      attrs: attrs,
+      interested_attrs: attrs.map(x => parseInt(x) - 1),
       registration_key: key,
     });
 
@@ -98,10 +111,26 @@ class App extends React.Component {
     console.log(this.state);
     let lhs;
     if (this.state.isRegistered) {
-      lhs = <Profile gid={this.state.gid} attrs={this.state.attrs}></Profile>;
+      lhs = <Profile gid={this.state.gid} attrs={this.state.interested_attrs}></Profile>;
     } else {
       lhs = <Registration onRegistration={this.onRegistration}></Registration>;
     }
+
+    const {
+      wasm,
+      attrs,
+      server_key,
+      selected_attrs,
+      total_attrs,
+    } = this.state;
+
+    const {
+      imgs,
+      registration_key,
+      interested_attrs,
+      gid,
+    } = this.state;
+
     return (
       <React.Fragment>
         <div class="container-md">
@@ -110,12 +139,25 @@ class App extends React.Component {
               {lhs}
             </div>
             <div className="py-3 col-md-6">
-              <Upload getImage={this.getImage}></Upload>
+              <Upload
+                getImage={this.getImage}
+                wasm={wasm}
+                server_key={server_key}
+                selected_attrs={selected_attrs}
+                total_attrs={total_attrs}
+              ></Upload>
             </div>
           </Row >
         </div>
         <div class="container-md">
-          <ImageList imgs={this.state.imgs} wasm={this.state.wasm}></ImageList>
+          <ImageList
+            wasm={wasm}
+            upk={registration_key}
+            av={interested_attrs}
+            gid={gid}
+            attributes={total_attrs}
+            imgs={imgs}
+          ></ImageList>
         </div>
       </React.Fragment>
     );
