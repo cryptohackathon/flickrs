@@ -6,11 +6,20 @@ import FormFileInput from "react-bootstrap/esm/FormFileInput";
 import FormFileLabel from "react-bootstrap/esm/FormFileLabel";
 import { NotificationManager } from "react-notifications";
 
+function wait(ms) {
+  var start = new Date().getTime();
+  var end = start;
+  while (end < start + ms) {
+    end = new Date().getTime();
+  }
+}
+
 class Upload extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
+      uploading: false,
       file: null,
       attrs: null,
       selected_attrs: [],
@@ -48,6 +57,8 @@ class Upload extends React.Component {
       return;
     }
 
+    this.setState({ uploading: true });
+
     fetch("/api/upload", {
       method: "POST",
       body: new Blob([this.state.file], { type: this.state.file.type }),
@@ -60,6 +71,10 @@ class Upload extends React.Component {
       }
     }).then(data => {
       console.log(data);
+
+      NotificationManager.success("Image uploaded! 🎉", null, 5000);
+
+      this.setState({ uploading: false });
     })
   }
 
@@ -88,6 +103,13 @@ class Upload extends React.Component {
 
   render() {
     const { attrs } = this.state;
+
+    let spinner = null;
+
+    if (this.state.uploading) {
+      spinner = <span id="upload_spinner" class="spinner-border spinner-border-sm mr-1 d-none" role="status" aria-hidden="true"></span>;
+    }
+
     return attrs && (
       <React.Fragment>
         <h1 class="text-center">Upload</h1>
@@ -108,7 +130,12 @@ class Upload extends React.Component {
           }
           <br></br>
           <br></br>
-          <Button onClick={(event) => this.handleUpload(event)}>Upload</Button>
+          <Button onClick={(event) => this.handleUpload(event)}>
+            {
+              spinner
+            }
+            Upload
+          </Button>
         </Form>
       </React.Fragment>
     );
