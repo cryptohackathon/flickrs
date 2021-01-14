@@ -1,14 +1,13 @@
 import './App.css';
 
 import React from "react";
-import * as Icon from 'react-bootstrap-icons';
 
 // import { Col, Row } from 'react-bootstrap';
 import ImageList from './image_list';
 import Registration from './registration';
 import Profile from './profile';
 import Upload from './upload';
-import { Container, Col, Row } from 'react-bootstrap';
+import { Row } from 'react-bootstrap';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -118,7 +117,6 @@ class App extends React.Component {
 
     const {
       wasm,
-      attrs,
       server_key,
       selected_attrs,
       total_attrs,

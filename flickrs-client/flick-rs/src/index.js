@@ -5,7 +5,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-notifications/lib/notifications.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { Container } from 'react-bootstrap';
 import NotificationContainer from 'react-notifications/lib/NotificationContainer';
 
 ReactDOM.render(

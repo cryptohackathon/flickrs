@@ -1,8 +1,6 @@
 import React from "react";
-import { Col, Row, Container, Card } from 'react-bootstrap';
-import { CardText } from "react-bootstrap-icons";
+import { Card } from 'react-bootstrap';
 
-import ImageDescription from "./image_description"
 
 class ImageList extends React.Component {
   render() {

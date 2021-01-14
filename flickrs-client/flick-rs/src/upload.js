@@ -1,20 +1,12 @@
 import React from "react";
-import { Row, Col, Form, Button, FormCheck, Badge } from "react-bootstrap";
+import { Form, Button, FormCheck, Badge } from "react-bootstrap";
 import FormCheckInput from "react-bootstrap/esm/FormCheckInput";
 import FormCheckLabel from "react-bootstrap/esm/FormCheckLabel";
 import FormFileInput from "react-bootstrap/esm/FormFileInput";
-import FormFileLabel from "react-bootstrap/esm/FormFileLabel";
 import { NotificationManager } from "react-notifications";
 
 import * as Icon from 'react-bootstrap-icons';
 
-function wait(ms) {
-  var start = new Date().getTime();
-  var end = start;
-  while (end < start + ms) {
-    end = new Date().getTime();
-  }
-}
 
 class Upload extends React.Component {
   constructor(props) {
@@ -48,7 +40,7 @@ class Upload extends React.Component {
     });
   }
 
-  handleUpload(event) {
+  handleUpload() {
     if (this.state.file === null) {
       NotificationManager.warning('Please select an image before uploading', null, 5000);
       return;
@@ -87,14 +79,14 @@ class Upload extends React.Component {
           console.log("Status: " + resp.status);
           return Promise.reject("server");
         }
-      }).then(data => {
+      }).then(() => {
 
         NotificationManager.success("Image uploaded! 🎉", null, 5000);
 
         thiz.setState({ uploading: false }); //, file: null, selected_attrs: [] });
       })
     };
-    reader.onerror = function (evt) {
+    reader.onerror = function () {
       // XXX
     }
   }
@@ -167,7 +159,7 @@ class Upload extends React.Component {
           }
           <br></br>
           <br></br>
-          <Button onClick={(event) => this.handleUpload(event)}>
+          <Button onClick={(event) => this.handleUpload()}>
             {
               spinner
             }

@@ -1,7 +1,5 @@
 import React from "react";
-import { Row, Col, Form, Button, FormCheck, Badge } from "react-bootstrap";
-import FormCheckInput from "react-bootstrap/esm/FormCheckInput";
-import FormFileInput from "react-bootstrap/esm/FormFileInput";
+import { Badge } from "react-bootstrap";
 
 class Profile extends React.Component {
   constructor(props) {

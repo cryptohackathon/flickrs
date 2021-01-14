@@ -1,7 +1,7 @@
 import React from "react";
 import * as Icon from 'react-bootstrap-icons';
 
-import { Button, Col, Form, FormCheck, Row, Badge } from 'react-bootstrap';
+import { Button, Form, FormCheck, Badge } from 'react-bootstrap';
 import FormCheckInput from "react-bootstrap/esm/FormCheckInput";
 import FormCheckLabel from "react-bootstrap/esm/FormCheckLabel";
 import { v4 as uuidv4 } from 'uuid';
@@ -28,7 +28,7 @@ class Registration extends React.Component {
       });
   }
 
-  handleRegistration(event) {
+  handleRegistration() {
 
     const attrs = this.state.selected_attrs.map(x => parseInt(x));
 
@@ -122,7 +122,7 @@ class Registration extends React.Component {
           }
           <br></br>
           <br></br>
-          <Button onClick={(event) => this.handleRegistration(event)}>Select attributes</Button>
+          <Button onClick={(event) => this.handleRegistration()}>Select attributes</Button>
         </Form>
       </React.Fragment>
     );
