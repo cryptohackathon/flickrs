@@ -120,6 +120,8 @@ stringData:
     server {
       server_name "flickrs.opencloudedge.be";
 
+      client_max_body_size 128M;
+
       location /api {
         proxy_redirect          off;
         proxy_pass_header       Server;
