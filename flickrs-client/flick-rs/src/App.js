@@ -16,9 +16,11 @@ class App extends React.Component {
     this.state = {
       isRegistered: false,
       imgs: [],
+      wasm: null,
       gid: null,
-      attrs: null,
+      attrs: [],
       selected_attrs: [],
+      interested_attrs: [],
       registration_key: null,
       server_key: null,
       total_attrs: null,
@@ -94,7 +96,7 @@ class App extends React.Component {
     this.setState({
       isRegistered: true,
       gid: gid,
-      attrs: attrs,
+      interested_attrs: attrs.map(x => parseInt(x) - 1),
       registration_key: key,
     });
 
@@ -104,19 +106,46 @@ class App extends React.Component {
 
   render() {
     console.log(this.state);
+
+    const {
+      wasm,
+      attrs,
+      server_key,
+      selected_attrs,
+      total_attrs,
+    } = this.state;
+
     if (this.state.isRegistered) {
-      const { imgs } = this.state;
-      return imgs && (
+      const {
+        imgs,
+        registration_key,
+        interested_attrs,
+        gid,
+      } = this.state;
+
+      return imgs && wasm && registration_key && gid && attrs && (
         <React.Fragment>
-          <Upload></Upload>
-          <ImageList imgs={this.state.imgs} wasm={this.state.wasm}></ImageList>
+          <Upload wasm={wasm} server_key={server_key} selected_attrs={selected_attrs} total_attrs={total_attrs}></Upload>
+          <ImageList
+            wasm={wasm}
+            upk={registration_key}
+            av={interested_attrs}
+            gid={gid}
+            attributes={total_attrs}
+            imgs={imgs}
+          ></ImageList>
         </React.Fragment>
       );
     } else {
-      return (
+      return wasm && server_key && selected_attrs && total_attrs && (
         <React.Fragment>
           <Registration onRegistration={this.onRegistration}></Registration>
-          <Upload wasm={this.state.wasm} server_key={this.state.server_key} selected_attrs={this.state.selected_attrs} total_attrs={this.state.total_attrs}></Upload>
+          <Upload
+            wasm={wasm}
+            server_key={server_key}
+            selected_attrs={selected_attrs}
+            total_attrs={total_attrs}
+          ></Upload>
         </React.Fragment>
       );
     }

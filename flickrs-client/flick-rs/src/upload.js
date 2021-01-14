@@ -42,7 +42,12 @@ class Upload extends React.Component {
       return;
     }
 
-    const { wasm, server_key, selected_attrs, total_attrs } = this.props;
+    const { wasm, server_key, total_attrs } = this.props;
+    const selected_attrs = this.state.selected_attrs.map(x => parseInt(x) - 1);
+
+    console.log("Server key: " + server_key);
+    console.log("Selected attrs: " + selected_attrs);
+    console.log("Total attrs: " + total_attrs);
 
     let blob = JSON.stringify({
       img: new Blob([this.state.file],

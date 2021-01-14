@@ -40,6 +40,7 @@ pub fn seal(
     selected_attrs: &JsValue,
     attributes: &JsValue,
 ) -> JsValue {
+    // ) {
     let dippe = Dippe::new(b"flickrs", 2);
 
     let authority: PublicKey = server_key.into_serde().unwrap();
@@ -64,20 +65,24 @@ pub fn seal(
 #[wasm_bindgen]
 pub fn open(
     upk: &JsValue,
-    av: &JsValue,
+    av: &[usize],
     gid: &JsValue,
-    bytes: &JsValue,
-    attributes: &JsValue,
-) -> JsValue {
+    bytes: &[u8],
+    attributes: usize,
+    // ) -> JsValue {
+) {
     let dippe = Dippe::new(b"flickrs", 2);
 
-    let av: AttributeVector = av.into_serde().unwrap();
+    let policy = dippe.create_attribute_vector(attributes, av);
+
     let upk: UserPrivateKey = upk.into_serde().unwrap();
-    let gid: Vec<u8> = gid.into_serde().unwrap();
-    let attributes: usize = attributes.into_serde().unwrap();
-    let sealed: Vec<u8> = bytes.into_serde().unwrap();
+    let gid: String = gid.into_serde().unwrap();
 
-    let open = hybrid::open(&dippe, attributes, &av, &upk, &gid, &sealed);
+    alert(&format!("Av len: {}", policy.len()));
+    alert(&format!("Payload size: {}", bytes.len()));
+    alert(&format!("GID: {:?}", &gid.as_bytes()));
 
-    JsValue::from_serde(&open).unwrap()
+    let open = hybrid::open(&dippe, attributes, &policy, &upk, &gid.as_bytes(), &bytes);
+
+    // JsValue::from_serde(&open).unwrap()
 }
