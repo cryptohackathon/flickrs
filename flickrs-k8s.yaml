@@ -21,6 +21,12 @@ spec:
       - name: flickrs-static
         imagePullPolicy: Always
         image: registry.gitlab.com/etrovub/smartnets/flickrs/nginx-static:master
+        livenessProbe:
+          httpGet:
+            path: /index.html
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 3
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -47,6 +53,12 @@ spec:
       - name: flickrs-api
         imagePullPolicy: Always
         image: registry.gitlab.com/etrovub/smartnets/flickrs/apiserver:master
+        livenessProbe:
+          httpGet:
+            path: /api/setup
+            port: 8000
+          initialDelaySeconds: 3
+          periodSeconds: 3
         env:
         - name: RUST_BACKTRACE
           value: "1"
