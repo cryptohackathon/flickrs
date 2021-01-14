@@ -45,13 +45,34 @@ class App extends React.Component {
       .then(data => this.setState({ server_key: data["server_key"] }));
   }
 
+  getImage(id) {
+    const api_str = "/api/" + id;
+    console.log(api_str);
+    fetch(api_str, { method: "GET" })
+      .then(response => {
+        console.log(response);
+        return response.json();
+      })
+      .then(data => {
+        console.log(data["image"]);
+        this.setState(state => {
+          state.imgs.push(data["image"]);
+          const imgs = state.imgs;
+          return {
+            imgs
+          };
+        })
+      })
+  }
+
   getImages() {
     // Get the images, better would be one by one.
-    fetch('/api/images', { method: "GET" })
+    fetch('/api/images_list', { method: "GET" })
       .then(response => response.json())
       .then(data => {
-        console.log(data["images"]);
-        this.setState({ imgs: data["images"] });
+        data["ids"].forEach(id => {
+          this.getImage(id);
+        });
       });
   }
 
