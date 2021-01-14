@@ -166,24 +166,27 @@ struct UploadReturnValue {
 #[post("/upload", data = "<data>")]
 fn api_post_upload_image(connection: ImagesDbConn, data: Data) -> Json<UploadReturnValue> {
     let id = allocate_image_row(&*connection);
-    let filename = format!(
-        "{}{}",
-        env::var("IMAGE_BASE_URL").expect("Image path not set!"),
-        id
-    );
+    let base = env::var("IMAGE_BASE_URL").expect("Image path not set!");
+    let base = std::path::Path::new(&base);
+    if let Err(e) = std::fs::create_dir_all(base) {
+        log::warn!("{}", e);
+    }
+    let filename = base.join(id.to_string());
     data.stream_to_file(&filename).expect("Could not read file");
-    Json(match set_image_path(&*connection, &id, &filename) {
-        Ok(_) => UploadReturnValue {
-            success: true,
-            id: Some(id),
-            error: None,
+    Json(
+        match set_image_path(&*connection, &id, filename.to_str().unwrap()) {
+            Ok(_) => UploadReturnValue {
+                success: true,
+                id: Some(id),
+                error: None,
+            },
+            Err(e) => UploadReturnValue {
+                success: false,
+                id: None,
+                error: Some(e.to_string()),
+            },
         },
-        Err(e) => UploadReturnValue {
-            success: false,
-            id: None,
-            error: Some(e.to_string()),
-        },
-    })
+    )
 }
 
 /// The return value from the /attributes GET operation
