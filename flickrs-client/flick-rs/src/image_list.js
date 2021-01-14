@@ -1,5 +1,5 @@
 import React from "react";
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row, Container } from 'react-bootstrap';
 
 import ImageDescription from "./image_description"
 
@@ -14,11 +14,11 @@ class ImageList extends React.Component {
         let imageUrl = urlCreator.createObjectURL(blob);
 
         return (
-          <Row className="my-3 py-3 border rounded shadow">
-            <Col xs={8}>
+          <Row xs={1} sm={2} className="my-3 py-3 border rounded shadow">
+            <Col>
               <img src={imageUrl} className="img-fluid rounded" />
             </Col>
-            <Col xs={4}>
+            <Col>
               <ImageDescription wasm={this.props.wasm}></ImageDescription>
             </Col>
           </Row>

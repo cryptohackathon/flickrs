@@ -80,12 +80,12 @@ class Registration extends React.Component {
   render() {
     const { attrs } = this.state;
     return attrs && (
-      <Row>
+    <React.Fragment>
+      <Row className="my-3 py-3 border rounded shadow">
         <Col>
-          <h1>Login page</h1>
+          <h1 class="text-center">Search</h1>
           <p>
-            Welcome to Flick-rs.
-            Please select one or more attributes you are interested in.
+            Select a combination of categories you are interested in.
           </p>
           <Form>
             {
@@ -103,6 +103,7 @@ class Registration extends React.Component {
           </Form>
         </Col>
       </Row >
+      </React.Fragment>
     );
   }
 }

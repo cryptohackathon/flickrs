@@ -83,11 +83,10 @@ class Upload extends React.Component {
   render() {
     const { attrs } = this.state;
     return attrs && (
-      <Row>
+      <Row className="my-3 py-3 border rounded shadow">
         <Col>
-          <h1>Upload</h1>
+          <h1 class="text-center">Upload</h1>
           <Form>
-            <FormFileLabel>Select an image to upload to Flick-rs</FormFileLabel>
             <FormFileInput onChange={(event) => this.handleSelectedFile(event)}></FormFileInput>
             <br></br>
             {
