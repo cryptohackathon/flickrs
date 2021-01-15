@@ -227,6 +227,8 @@ metadata:
   name: ingress-flickrs
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-body-size: "20m"
+    nginx.org/client-max-body-size: "20m"
     kubernetes.io/ingress.class: "nginx-public"
     cert-manager.io/cluster-issuer: letsencrypt-cloudflare-production
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
