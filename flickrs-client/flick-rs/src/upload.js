@@ -82,7 +82,7 @@ class Upload extends React.Component {
       const json = await resp.json();
 
       if (json.success) {
-        toast.success("Image ploaded! 🎉");
+        toast.success("Image uploaded! 🎉");
       } else {
         toast.error("Failed to upload image");
       }
