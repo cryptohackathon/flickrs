@@ -28,7 +28,7 @@ class ImageList extends React.Component {
             <Card className="my-3 shadow">
               <img src={imageUrl} className="card-img-top" />
               <div class="card-body">
-                {data.descirption}
+                {data.description}
               </div>
             </Card>
           </Col>
