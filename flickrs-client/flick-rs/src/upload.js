@@ -17,8 +17,10 @@ class Upload extends React.Component {
       uploading: false,
       attrs: null,
       selected_attrs: [],
+      img_descr: "",
     };
 
+    this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
     this.handleUpload = this.handleUpload.bind(this);
 
     this.fileInput = React.createRef();
@@ -39,6 +41,7 @@ class Upload extends React.Component {
 
 
   async handleUpload() {
+
     if (this.fileInput.current.files[0] === undefined || this.fileInput.current.files[0] === null) {
       toast.warning("Please select an image before uploading");
       return;
@@ -50,6 +53,7 @@ class Upload extends React.Component {
     }
 
     toast.info("Encrypting and uploading image...");
+
 
 
     const { wasm, server_key, total_attrs } = this.props;
@@ -64,7 +68,7 @@ class Upload extends React.Component {
       let blob = JSON.stringify({
         img: Array.from(new Uint8Array(evt.target.result)),
         type: thiz.fileInput.current.files[0].type,
-        description: "this is a description"
+        description: thiz.state.img_descr,
       });
 
       blob = wasm.seal(server_key, blob, selected_attrs, total_attrs);
@@ -118,6 +122,10 @@ class Upload extends React.Component {
     }
   }
 
+  handleDescriptionChange(event) {
+    this.setState({ img_descr: event.target.value });
+  }
+
   render() {
     const { attrs } = this.state;
 
@@ -146,31 +154,37 @@ class Upload extends React.Component {
             </div>
           </div>
         </div>
+        <hr />
         <Form>
-          <FormFileInput ref={this.fileInput}></FormFileInput>
-          <br></br>
-          {
-            attrs.map((e, i) => {
-              return (
-                <FormCheck className="form-check-inline">
-                  <FormCheckInput value={attrs[i].id}
-                    onChange={(event) => this.handleChecked(event)}></FormCheckInput>
-                  <FormCheckLabel>
-                    <Badge className="bg-secondary text-white mr-1 p-1">{attrs[i].name}</Badge>
-                  </FormCheckLabel>
-                </FormCheck>);
-            })
-          }
-          <br></br>
-          <br></br>
+          <div class="mb-3">
+            <FormFileInput ref={this.fileInput}></FormFileInput>
+          </div>
+          <div class="mb-3">
+            {
+              attrs.map((e, i) => {
+                return (
+                  <FormCheck className="form-check-inline">
+                    <FormCheckInput value={attrs[i].id}
+                      onChange={(event) => this.handleChecked(event)}></FormCheckInput>
+                    <FormCheckLabel>
+                      <Badge className="bg-secondary text-white mr-1 p-1">{attrs[i].name}</Badge>
+                    </FormCheckLabel>
+                  </FormCheck>);
+              })
+            }
+          </div>
+          <div class="mb-3">
+            <label for="image_descr" class="form-label">Image description</label>
+            <textarea class="form-control" id="image_descr" rows="3" placeholder="Such empty, much wow" value={this.state.img_descr} onChange={this.handleDescriptionChange}></textarea>
+          </div>
           <Button onClick={(event) => this.handleUpload()}>
             {
               spinner
             }
             Upload
           </Button>
-        </Form>
-      </React.Fragment>
+        </Form >
+      </React.Fragment >
     );
   }
 }

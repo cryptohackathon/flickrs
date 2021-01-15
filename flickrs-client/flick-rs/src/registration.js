@@ -105,21 +105,22 @@ class Registration extends React.Component {
             </div>
           </div>
         </div>
+        <hr />
         <Form>
-          {
-            attrs.map((e, i) => {
-              return (
-                <FormCheck className="form-check-inline">
-                  <FormCheckInput value={attrs[i].id}
-                    onChange={(event) => this.handleChecked(event)}></FormCheckInput>
-                  <FormCheckLabel>
-                    <Badge className="bg-secondary text-white mr-1 p-1">{attrs[i].name}</Badge>
-                  </FormCheckLabel>
-                </FormCheck>);
-            })
-          }
-          <br></br>
-          <br></br>
+          <div class="mb-3">
+            {
+              attrs.map((e, i) => {
+                return (
+                  <FormCheck className="form-check-inline">
+                    <FormCheckInput value={attrs[i].id}
+                      onChange={(event) => this.handleChecked(event)}></FormCheckInput>
+                    <FormCheckLabel>
+                      <Badge className="bg-secondary text-white mr-1 p-1">{attrs[i].name}</Badge>
+                    </FormCheckLabel>
+                  </FormCheck>);
+              })
+            }
+          </div>
           <Button onClick={(event) => this.handleRegistration()}>Select attributes</Button>
         </Form>
       </React.Fragment>
