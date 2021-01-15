@@ -13,25 +13,25 @@ class ImageList extends React.Component {
 
         if (imgs[i].success) {
           return (
-            <Col className="col-lg-4 col-md-6">
+            <div class="col-lg-4 col-md-6">
               <Card className="my-3 shadow">
                 <img src={imgs[i].url} className="card-img-top" />
                 <div class="card-body">
                   {imgs[i].descr}
                 </div>
               </Card>
-            </Col>
+            </div>
           );
         } else {
           return (
-            <Col className="col-lg-4 col-md-6">
+            <div class="col-lg-4 col-md-6">
               <Card className="my-3 shadow">
                 <Icon.ShieldFillX className="p-3" width="auto" size="128px" />
                 <div class="card-body">
                   Unable to decrypt this image 😥
                 </div>
               </Card>
-            </Col>
+            </div>
           );
         }
       })

@@ -54,8 +54,6 @@ class Upload extends React.Component {
 
     toast.info("Encrypting and uploading image...");
 
-
-
     const { wasm, server_key, total_attrs } = this.props;
     const selected_attrs = this.state.selected_attrs.map(x => parseInt(x) - 1);
 
@@ -84,9 +82,12 @@ class Upload extends React.Component {
       }
 
       const json = await resp.json();
+      console.log(json);
 
       if (json.success) {
         toast.success("Image uploaded! 🎉");
+
+        await thiz.props.getImage(json.id);
       } else {
         toast.error("Failed to upload image");
       }
