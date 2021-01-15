@@ -86,8 +86,9 @@ class App extends React.Component {
     let decrypted = wasm.open(upk, interested_attrs, gid, data.image, total_attrs);
 
     if (decrypted === undefined || decrypted === null) {
-      console.log("Cannot decrypt");
-      toast.warning("Cannot decrypt image");
+      // Don't show when you cannot decrypt
+      // console.log("Cannot decrypt");
+      // toast.warning("Cannot decrypt image");
       return;
     } else {
 
@@ -98,7 +99,7 @@ class App extends React.Component {
       let urlCreator = window.URL || window.webkitURL;
       const imageUrl = urlCreator.createObjectURL(blob);
 
-      const descr = decrypted.desc;
+      const descr = decrypted.description;
 
       this.setState(state => {
         state.imgs.push({
