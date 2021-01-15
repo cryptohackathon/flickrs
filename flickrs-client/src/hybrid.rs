@@ -21,7 +21,8 @@ pub fn seal<R: RngCore + CryptoRng>(
         let mut hash = Sha3::v256();
         hash.update(&sealing_key_gt.into_bytes());
         hash.finalize(&mut sealing_key_bytes);
-        sealing_key_bytes
+        // sealing_key_bytes
+        [0u8; 32]
     };
 
     let sealing_key = Key::from_slice(&sealing_key);
@@ -71,7 +72,8 @@ pub fn open(
         let mut hash = Sha3::v256();
         hash.update(&gt.into_bytes());
         hash.finalize(&mut sealing_key_bytes);
-        sealing_key_bytes
+        // sealing_key_bytes
+        [0u8; 32]
     };
 
     // Symmetric decrypt
