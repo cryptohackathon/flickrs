@@ -12,15 +12,14 @@ class ImageList extends React.Component {
 
         let data = wasm.open(upk, av, gid, this.props.imgs[i], attributes);
 
-        if (data === undefined) {
+        if (data === null) {
           console.log("Cannot decrypt");
           return;
         } else {
-          console.log("before json: " + data);
+          data = new TextDecoder("utf-8").decode(new Uint8Array(data));
           data = JSON.parse(data);
-          console.log("after json: " + data);
 
-          let blob = new Blob([data.img]);
+          let blob = new Blob([new Uint8Array(data.img)]);
           let urlCreator = window.URL || window.webkitURL;
           let imageUrl = urlCreator.createObjectURL(blob);
 
