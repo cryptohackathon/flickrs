@@ -320,7 +320,7 @@ fn api_get_get_attribute_by_name(
 /// The return value for a /setup GET request
 #[derive(Serialize, Deserialize)]
 struct ServerKeyResponse {
-    server_key: cife_rs::abe::dippe::PublicKey,
+    server_key: Vec<u8>,
 }
 
 /// GET the authority public key that is used for all attributes.
@@ -332,7 +332,7 @@ struct ServerKeyResponse {
 #[get("/setup")]
 fn api_get_server_key(keys: State<KeyMaterial>) -> Json<ServerKeyResponse> {
     Json(ServerKeyResponse {
-        server_key: keys.inner().public.clone(),
+        server_key: keys.inner().public.clone().into_bytes(),
     })
 }
 
@@ -347,7 +347,7 @@ struct RegistrationRequest {
 #[derive(Serialize)]
 struct RegistrationDetails {
     success: bool,
-    registration_key: Option<UserPrivateKey>,
+    registration_key: Option<Vec<u8>>,
     error: Option<String>,
 }
 
@@ -419,7 +419,7 @@ fn api_post_register_user_with_attributes(
 
     Json(RegistrationDetails {
         success: true,
-        registration_key: Some(upk),
+        registration_key: Some(upk.into_bytes()),
         error: None,
     })
 }

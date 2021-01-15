@@ -35,14 +35,14 @@ pub fn get_image_title() -> String {
 
 #[wasm_bindgen]
 pub fn seal(
-    server_key: &JsValue,
+    server_key: &[u8],
     bytes: &JsValue,
     selected_attrs: &JsValue,
     attributes: &JsValue,
 ) -> JsValue {
     let dippe = Dippe::new(b"flickrs", 2);
 
-    let authority: PublicKey = server_key.into_serde().unwrap();
+    let authority = PublicKey::from_bytes(2, server_key);
     let bytes: String = bytes.into_serde().unwrap();
     let selected_attrs: Vec<usize> = selected_attrs.into_serde().unwrap();
     let attributes: usize = attributes.into_serde().unwrap();
@@ -62,18 +62,12 @@ pub fn seal(
 }
 
 #[wasm_bindgen]
-pub fn open(
-    upk: &JsValue,
-    av: &[usize],
-    gid: &JsValue,
-    bytes: &[u8],
-    attributes: usize,
-) -> JsValue {
+pub fn open(upk: &[u8], av: &[usize], gid: &JsValue, bytes: &[u8], attributes: usize) -> JsValue {
     let dippe = Dippe::new(b"flickrs", 2);
 
     let policy = dippe.create_attribute_vector(attributes, av);
 
-    let upk: UserPrivateKey = upk.into_serde().unwrap();
+    let upk = UserPrivateKey::from_bytes(upk);
     let gid: String = gid.into_serde().unwrap();
 
     let open = hybrid::open(&dippe, attributes, &policy, &upk, &gid.as_bytes(), &bytes);
