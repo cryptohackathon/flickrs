@@ -94,10 +94,6 @@ class App extends React.Component {
       decrypted = new TextDecoder("utf-8").decode(new Uint8Array(decrypted));
       decrypted = JSON.parse(decrypted);
 
-      console.log("before json: " + decrypted);
-      data = JSON.parse(decrypted);
-      console.log("after json: " + decrypted);
-
       let blob = new Blob([new Uint8Array(decrypted.img)]);
       let urlCreator = window.URL || window.webkitURL;
       const imageUrl = urlCreator.createObjectURL(blob);
