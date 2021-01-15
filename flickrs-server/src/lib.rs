@@ -66,6 +66,11 @@ pub fn get_all_image_paths(
     images.select(path).load(conn)
 }
 
+pub fn delete_all_images(conn: &SqliteConnection) -> Result<usize, diesel::result::Error> {
+    use self::schema::images::dsl::images;
+    diesel::delete(images).execute(conn)
+}
+
 /// Get all attributes
 pub fn get_all_attributes(
     conn: &SqliteConnection,

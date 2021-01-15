@@ -78,6 +78,48 @@ fn api_get_get_image(connection: ImagesDbConn, image_id: i32) -> Json<GetImageRe
     })
 }
 
+/// The return value of the /delete_all_images POST operation
+#[derive(Serialize)]
+struct DeleteAllImagesReturnValue {
+    success: bool,
+    error: Option<String>,
+}
+
+/// POST to delete all images in the database
+///
+/// ## API
+/// * Address: root/delete_all_images
+/// * Data Needed: None
+/// * Returns: { success: bool, error: Sting or Null}
+#[post("/delete_all_images")]
+fn api_delete_all_images(connection: ImagesDbConn) -> Json<DeleteAllImagesReturnValue> {
+    let paths = get_all_image_paths(&*connection);
+
+    if paths.is_err() {
+        return Json(DeleteAllImagesReturnValue {
+            success: false,
+            error: paths.err().map(|e| e.to_string()),
+        });
+    }
+
+    let paths = paths.unwrap();
+    paths
+        .into_iter()
+        .filter(Option::is_some)
+        .for_each(|f| std::fs::remove_file(f.unwrap()).unwrap());
+
+    Json(match delete_all_images(&*connection) {
+        Ok(_) => DeleteAllImagesReturnValue {
+            success: true,
+            error: None,
+        },
+        _ => DeleteAllImagesReturnValue {
+            success: false,
+            error: Some("Unable to delete all images".into()),
+        },
+    })
+}
+
 /// The return value of the /images GET operation
 #[derive(Serialize)]
 struct GetImagesReturnValue {
@@ -439,6 +481,7 @@ fn main() {
             routes![
                 api_get_get_image,
                 api_post_upload_image,
+                api_delete_all_images,
                 api_get_all_images,
                 api_get_all_image_ids,
                 api_get_all_attributes,
