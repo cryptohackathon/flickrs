@@ -86,9 +86,17 @@ class App extends React.Component {
     let decrypted = wasm.open(upk, interested_attrs, gid, data.image, total_attrs);
 
     if (decrypted === undefined || decrypted === null) {
-      // Don't show when you cannot decrypt
-      // console.log("Cannot decrypt");
-      // toast.warning("Cannot decrypt image");
+      this.setState(state => {
+        state.imgs.push({
+          success: false,
+          url: null,
+          descr: null,
+        });
+        const imgs = state.imgs;
+        return {
+          imgs
+        };
+      });
       return;
     } else {
 
@@ -103,6 +111,7 @@ class App extends React.Component {
 
       this.setState(state => {
         state.imgs.push({
+          success: true,
           url: imageUrl,
           descr: descr,
         });
