@@ -10,6 +10,7 @@ import Upload from './upload';
 import { Row } from 'react-bootstrap';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
+import NotificationManager from 'react-notifications/lib/NotificationManager';
 
 class App extends React.Component {
   constructor(props) {
@@ -22,7 +23,7 @@ class App extends React.Component {
       attrs: [],
       selected_attrs: [],
       interested_attrs: [],
-      registration_key: null,
+      upk: null,
       server_key: null,
       total_attrs: null,
     };
@@ -47,58 +48,94 @@ class App extends React.Component {
     }
   };
 
-  serverSetup() {
-    fetch("/api/setup", { method: "GET" })
-      .then(response => response.json())
-      .then(data => this.setState({ server_key: data["server_key"] }));
+  async serverSetup() {
+    const resp = await fetch("/api/setup", { method: "GET" });
+
+    if (resp.status !== 200) {
+      NotificationManager.error("Error connecting to server: status " + resp.status, null, 5000);
+    }
+
+    const data = await resp.json();
+    this.setState({ server_key: data["server_key"] });
   }
 
-  loadAttrs() {
-    fetch("/api/attributes", { method: "GET" })
-      .then(response => response.json())
-      .then(data => {
-        this.setState({ total_attrs: data["attributes"].length })
-      });
+  async loadAttrs() {
+    const resp = await fetch("/api/attributes", { method: "GET" });
+
+    if (resp.status !== 200) {
+      NotificationManager.error("Error connecting to server: status " + resp.status, null, 5000);
+    }
+
+    const data = await resp.json();
+    this.setState({ total_attrs: data["attributes"].length })
   }
 
-  getImage(id) {
-    fetch("/api/" + id, { method: "GET" })
-      .then(response => {
-        return response.json();
-      })
-      .then(data => {
-        this.setState(state => {
-          state.imgs.push(data["image"]);
-          const imgs = state.imgs;
-          return {
-            imgs
-          };
-        })
-      })
-  }
+  async getImage(id) {
+    const resp = await fetch("/api/" + id, { method: "GET" });
 
-  getImages() {
-    // Get the images, better would be one by one.
-    fetch('/api/images_list', { method: "GET" })
-      .then(response => response.json())
-      .then(data => {
-        data["ids"].forEach(id => {
-          this.getImage(id);
+    if (resp.status !== 200) {
+      NotificationManager.error("Error connecting to server: status " + resp.status, null, 5000);
+    }
+
+    const data = await resp.json();
+
+    const { wasm, upk, interested_attrs, gid, total_attrs } = this.state;
+
+    console.log("Trying to decrypt");
+
+    let decrypted = wasm.open(upk, interested_attrs, gid, data.image, total_attrs);
+
+    if (decrypted === undefined || decrypted === null) {
+      console.log("Cannot decrypt");
+      NotificationManager.warning("Cannot decrypt image.", null, 1000);
+      return;
+    } else {
+      console.log("before json: " + decrypted);
+      data = JSON.parse(decrypted);
+      console.log("after json: " + decrypted);
+
+      let blob = new Blob([decrypted.img]);
+      let urlCreator = window.URL || window.webkitURL;
+      const imageUrl = urlCreator.createObjectURL(blob);
+      const descr = decrypted.desc;
+
+      this.setState(state => {
+        state.imgs.push({
+          url: imageUrl,
+          descr: descr,
         });
+        const imgs = state.imgs;
+        return {
+          imgs
+        };
       });
+    }
+  }
+
+  async getImages() {
+    const resp = await fetch('/api/images_list', { method: "GET" });
+
+    if (resp.status !== 200) {
+      NotificationManager.error("Error connecting to server: status " + resp.status, null, 5000);
+    }
+
+    const data = await resp.json();
+
+    data["ids"].forEach(async (id) => {
+      await this.getImage(id);
+    });
   }
 
   /// Is called by the Registration component
-  onRegistration(gid, attrs, key) {
+  async onRegistration(gid, attrs, key) {
     this.setState({
       isRegistered: true,
       gid: gid,
       interested_attrs: attrs.map(x => parseInt(x) - 1),
-      registration_key: key,
+      upk: key,
     });
 
-    // TODO: just for now to display something.
-    this.getImages();
+    await this.getImages();
   }
 
   render() {
@@ -118,7 +155,7 @@ class App extends React.Component {
 
     const {
       imgs,
-      registration_key,
+      upk: registration_key,
       interested_attrs,
       gid,
     } = this.state;
@@ -143,11 +180,6 @@ class App extends React.Component {
         </div>
         <div class="container-md">
           <ImageList
-            wasm={wasm}
-            upk={registration_key}
-            av={interested_attrs}
-            gid={gid}
-            attributes={total_attrs}
             imgs={imgs}
           ></ImageList>
         </div>

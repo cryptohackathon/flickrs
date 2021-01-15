@@ -14,32 +14,31 @@ class Upload extends React.Component {
 
     this.state = {
       uploading: false,
-      file: null,
       attrs: null,
       selected_attrs: [],
     };
 
     this.handleUpload = this.handleUpload.bind(this);
-    this.handleSelectedFile = this.handleSelectedFile.bind(this);
+
+    this.fileInput = React.createRef();
   }
 
-  componentDidMount() {
-    fetch("/api/attributes", { method: "GET" })
-      .then(response => response.json())
-      .then(data => {
-        this.setState({ attrs: data["attributes"] })
-      });
+  async componentDidMount() {
+    const resp = await fetch("/api/attributes", { method: "GET" });
+
+    if (resp.status !== 200) {
+      NotificationManager.error("Error fetching attributes: status " + resp.status, null, 5000);
+      return;
+    }
+
+    const json = await resp.json();
+
+    this.setState({ attrs: json["attributes"] });
   }
 
 
-  handleSelectedFile(event) {
-    this.setState({
-      file: event.target.files[0],
-    });
-  }
-
-  handleUpload() {
-    if (this.state.file === null) {
+  async handleUpload() {
+    if (this.fileInput.current.files[0] === undefined || this.fileInput.current.files[0] === null) {
       NotificationManager.warning('Please select an image before uploading', null, 5000);
       return;
     }
@@ -55,33 +54,37 @@ class Upload extends React.Component {
     this.setState({ uploading: true });
 
     let reader = new FileReader();
-    reader.readAsArrayBuffer(this.state.file);
+    reader.readAsArrayBuffer(this.fileInput.current.files[0]);
     let thiz = this;
-    reader.onload = function (evt) {
+    reader.onload = async function (evt) {
       let blob = JSON.stringify({
         img: Array.from(new Uint8Array(evt.target.result)),
-        type: thiz.state.file.type,
+        type: thiz.fileInput.current.files[0].type,
         description: "this is a description"
       });
 
       blob = wasm.seal(server_key, blob, selected_attrs, total_attrs);
 
-      fetch("/api/upload", {
+      const resp = await fetch("/api/upload", {
         method: "POST",
         body: new File([new Uint8Array(blob)], "contents"),
-      }).then(resp => {
-        if (resp.status === 200) {
-          return resp.json();
-        } else {
-          console.log("Status: " + resp.status);
-          return Promise.reject("server");
-        }
-      }).then(() => {
+      });
 
+      if (resp.status !== 200) {
+        console.log("Server error: " + resp.status);
+        return;
+      }
+
+      const json = await resp.json();
+
+      if (json.success) {
         NotificationManager.success("Image uploaded! 🎉", null, 5000);
+      } else {
+        NotificationManager.error("Error: " + json.error, null, 5000);
+      }
 
-        thiz.setState({ uploading: false }); //, file: null, selected_attrs: [] });
-      })
+      thiz.setState({ uploading: false }); //, file: null, selected_attrs: [] });
+
     };
     reader.onerror = function () {
       // XXX
@@ -140,7 +143,7 @@ class Upload extends React.Component {
           </div>
         </div>
         <Form>
-          <FormFileInput id="form-file" onChange={(event) => this.handleSelectedFile(event)}></FormFileInput>
+          <FormFileInput ref={this.fileInput}></FormFileInput>
           <br></br>
           {
             attrs.map((e, i) => {
