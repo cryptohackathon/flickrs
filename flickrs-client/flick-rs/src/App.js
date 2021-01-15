@@ -113,6 +113,8 @@ class App extends React.Component {
   }
 
   async getImages() {
+    toast.info("Downloading and decrypting images...");
+
     const resp = await fetch('/api/images_list', { method: "GET" });
 
     if (resp.status !== 200) {
