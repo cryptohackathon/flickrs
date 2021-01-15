@@ -21,7 +21,8 @@ pub fn seal<R: RngCore + CryptoRng>(
         let mut hash = Sha3::v256();
         hash.update(&sealing_key_gt.into_bytes());
         hash.finalize(&mut sealing_key_bytes);
-        sealing_key_bytes
+        // sealing_key_bytes
+        [0u8; 32]
     };
 
     let sealing_key = Key::from_slice(&sealing_key);
@@ -29,7 +30,7 @@ pub fn seal<R: RngCore + CryptoRng>(
     let nonce = Nonce::from_slice(&[0u8; 12]);
     let cipher = ChaCha20Poly1305::new(sealing_key);
 
-    // Format: 64 bytes for the padded encryption key as Gt element,
+    // Format: The padded encryption key as CipherText element,
     //         + cipher text
     //         + tag
 
@@ -71,7 +72,8 @@ pub fn open(
         let mut hash = Sha3::v256();
         hash.update(&gt.into_bytes());
         hash.finalize(&mut sealing_key_bytes);
-        sealing_key_bytes
+        // sealing_key_bytes
+        [0u8; 32]
     };
 
     // Symmetric decrypt
@@ -97,7 +99,7 @@ mod tests {
 
         let (alice_pub, alice_priv) = dippe.generate_key_pair(&mut rng);
 
-        let attribs = 1;
+        let attribs = 2;
         let carol_policy = &[0];
         let carol_policy = dippe.create_attribute_vector(attribs, carol_policy);
         let gid = b"Carol";
@@ -110,7 +112,7 @@ mod tests {
                 usks.push(dippe.generate_user_private_key_part(
                     &alice_priv,
                     j,
-                    &[&alice_pub, &alice_pub],
+                    &[&alice_pub, &alice_pub, &alice_pub],
                     gid,
                     &carol_policy,
                 ));
