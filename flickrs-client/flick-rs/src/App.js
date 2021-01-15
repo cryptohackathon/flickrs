@@ -183,9 +183,11 @@ class App extends React.Component {
           </Row >
         </div>
         <div class="container-md">
-          <ImageList
-            imgs={imgs}
-          ></ImageList>
+          <Row>
+            <ImageList
+              imgs={imgs}
+            ></ImageList>
+          </Row>
         </div>
       </React.Fragment>
     );
