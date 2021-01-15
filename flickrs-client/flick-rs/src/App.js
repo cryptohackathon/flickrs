@@ -9,8 +9,8 @@ import Profile from './profile';
 import Upload from './upload';
 import { Row } from 'react-bootstrap';
 
+import { toast } from 'react-toastify';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import NotificationManager from 'react-notifications/lib/NotificationManager';
 
 class App extends React.Component {
   constructor(props) {
@@ -52,7 +52,7 @@ class App extends React.Component {
     const resp = await fetch("/api/setup", { method: "GET" });
 
     if (resp.status !== 200) {
-      NotificationManager.error("Error connecting to server: status " + resp.status, null, 5000);
+      toast.error("Error connecting to server: status " + resp.status);
     }
 
     const data = await resp.json();
@@ -63,7 +63,7 @@ class App extends React.Component {
     const resp = await fetch("/api/attributes", { method: "GET" });
 
     if (resp.status !== 200) {
-      NotificationManager.error("Error connecting to server: status " + resp.status, null, 5000);
+      toast.error("Error connecting to server: status " + resp.status);
     }
 
     const data = await resp.json();
@@ -74,7 +74,7 @@ class App extends React.Component {
     const resp = await fetch("/api/" + id, { method: "GET" });
 
     if (resp.status !== 200) {
-      NotificationManager.error("Error connecting to server: status " + resp.status, null, 5000);
+      toast.error("Error connecting to server: status " + resp.status);
     }
 
     const data = await resp.json();
@@ -87,7 +87,7 @@ class App extends React.Component {
 
     if (decrypted === undefined || decrypted === null) {
       console.log("Cannot decrypt");
-      NotificationManager.warning("Cannot decrypt image.", null, 1000);
+      toast.warning("Cannot decrypt image");
       return;
     } else {
       console.log("before json: " + decrypted);
@@ -116,7 +116,7 @@ class App extends React.Component {
     const resp = await fetch('/api/images_list', { method: "GET" });
 
     if (resp.status !== 200) {
-      NotificationManager.error("Error connecting to server: status " + resp.status, null, 5000);
+      toast.error("Error connecting to server: status " + resp.status);
     }
 
     const data = await resp.json();

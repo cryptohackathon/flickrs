@@ -2,16 +2,15 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'react-notifications/lib/notifications.css';
+import 'react-toastify/dist/ReactToastify.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import NotificationContainer from 'react-notifications/lib/NotificationContainer';
+import { ToastContainer } from 'react-toastify';
 
 ReactDOM.render(
   <React.Fragment>
     <App />
-    <NotificationContainer>
-    </NotificationContainer>
+    <ToastContainer />
   </React.Fragment>,
   document.getElementById('root')
 );

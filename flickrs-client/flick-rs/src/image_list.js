@@ -1,6 +1,5 @@
 import React from "react";
 import { Card } from 'react-bootstrap';
-import NotificationManager from "react-notifications/lib/NotificationManager";
 
 
 class ImageList extends React.Component {

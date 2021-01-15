@@ -6,7 +6,7 @@ import FormCheckInput from "react-bootstrap/esm/FormCheckInput";
 import FormCheckLabel from "react-bootstrap/esm/FormCheckLabel";
 import { v4 as uuidv4 } from 'uuid';
 
-import { NotificationManager } from 'react-notifications';
+import { toast } from "react-toastify";
 
 class Registration extends React.Component {
   constructor(props) {
@@ -32,7 +32,7 @@ class Registration extends React.Component {
     const attrs = this.state.selected_attrs.map(x => parseInt(x));
 
     if (attrs.length === 0) {
-      NotificationManager.warning('Please select at least one attribute', null, 5000);
+      toast.warning("Please select at least one attribute");
       return;
     }
 

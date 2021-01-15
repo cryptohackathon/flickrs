@@ -3,7 +3,8 @@ import { Form, Button, FormCheck, Badge } from "react-bootstrap";
 import FormCheckInput from "react-bootstrap/esm/FormCheckInput";
 import FormCheckLabel from "react-bootstrap/esm/FormCheckLabel";
 import FormFileInput from "react-bootstrap/esm/FormFileInput";
-import { NotificationManager } from "react-notifications";
+
+import { toast } from "react-toastify";
 
 import * as Icon from 'react-bootstrap-icons';
 
@@ -27,7 +28,7 @@ class Upload extends React.Component {
     const resp = await fetch("/api/attributes", { method: "GET" });
 
     if (resp.status !== 200) {
-      NotificationManager.error("Error fetching attributes: status " + resp.status, null, 5000);
+      toast.error("Error fetching attributes");
       return;
     }
 
@@ -39,14 +40,17 @@ class Upload extends React.Component {
 
   async handleUpload() {
     if (this.fileInput.current.files[0] === undefined || this.fileInput.current.files[0] === null) {
-      NotificationManager.warning('Please select an image before uploading', null, 5000);
+      toast.warning("Please select an image before uploading");
       return;
     }
 
     if (this.state.selected_attrs.length === 0) {
-      NotificationManager.warning('Please select one or more attributes before uploading', null, 5000);
+      toast.warning("Please select one or more attributes before uploading");
       return;
     }
+
+    toast.info("Encrypting and uploading image...");
+
 
     const { wasm, server_key, total_attrs } = this.props;
     const selected_attrs = this.state.selected_attrs.map(x => parseInt(x) - 1);
@@ -78,9 +82,9 @@ class Upload extends React.Component {
       const json = await resp.json();
 
       if (json.success) {
-        NotificationManager.success("Image uploaded! 🎉", null, 5000);
+        toast.success("Image ploaded! 🎉");
       } else {
-        NotificationManager.error("Error: " + json.error, null, 5000);
+        toast.error("Failed to upload image");
       }
 
       thiz.setState({ uploading: false }); //, file: null, selected_attrs: [] });
