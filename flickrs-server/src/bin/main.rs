@@ -338,12 +338,7 @@ fn api_post_register_user_with_attributes(
         }
     };
 
-    let attr_count = db_attrs
-        .iter()
-        .map(|x| x.id)
-        .max()
-        .map(|x| x + 1)
-        .unwrap_or(0) as usize;
+    let attr_count = db_attrs.iter().map(|x| x.id).max().unwrap_or(0) as usize;
     let av_len = attr_count + 1;
     // We are the authority for every single key
     let authorities: Vec<_> = (0..av_len).map(|_i| &keys.public).collect();
@@ -351,7 +346,7 @@ fn api_post_register_user_with_attributes(
     let mut av = vec![];
     for attr in db_attrs {
         if request.attributes.contains(&attr.id) {
-            av.push(attr.id as usize);
+            av.push(attr.id as usize - 1);
         }
     }
     if av.len() != request.attributes.len() {
