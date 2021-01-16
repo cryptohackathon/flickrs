@@ -204,6 +204,18 @@ class App extends React.Component {
               this policy is called a &quot;conjunction policy&quot;.
             The DIPPE scheme allows for multiple other policies, but these remain unimplemented in our implementation.
           </p>
+          <p class="bs-callout bs-callout-danger">
+            <div class="media">
+              <Icon.ExclamationTriangle className="mr-3" size={64} />
+              <div class="media-body">
+                <h5 class="mt-0">Hourly wipe</h5>
+                <p>
+                  To give everyone a chance to play with this demo, <span class="font-weight-bold">we wipe and reset the data every hour</span>.
+                  This is also to keep the load on the servers down.
+                </p>
+              </div>
+            </div>
+          </p>
         </Container>
         <div class="container-md">
           <Row className="my-3 py-3 border rounded shadow">
