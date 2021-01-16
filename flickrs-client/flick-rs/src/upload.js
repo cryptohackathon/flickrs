@@ -143,7 +143,7 @@ class Upload extends React.Component {
           Upload an image.
           The attributes you select here, will determine who can see the uploaded picture.
         </p>
-        <div class="bs-callout bs-callout-info">
+        <div class="bs-callout bs-callout-warning">
           <div class="media">
             <Icon.ExclamationTriangle className="mr-3" size={64} />
             <div class="media-body">
