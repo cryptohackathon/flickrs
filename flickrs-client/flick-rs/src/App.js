@@ -7,7 +7,7 @@ import ImageList from './image_list';
 import Registration from './registration';
 import Profile from './profile';
 import Upload from './upload';
-import { Row } from 'react-bootstrap';
+import { Container, Row } from 'react-bootstrap';
 
 import { toast } from 'react-toastify';
 import 'bootstrap/dist/css/bootstrap.min.css';
