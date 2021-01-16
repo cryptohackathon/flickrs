@@ -28,7 +28,7 @@ class Profile extends React.Component {
 
     return (
       <React.Fragment>
-        <h1 class="text-center">Your profile</h1>
+        <h2 class="text-center">Your profile</h2>
         <table class="table">
           <tr>
             <th scope="row">Global ID</th>

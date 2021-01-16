@@ -86,7 +86,7 @@ class Registration extends React.Component {
     const { attrs } = this.state;
     return attrs && (
       <React.Fragment>
-        <h1 class="text-center">Registration</h1>
+        <h2 class="text-center">Registration</h2>
         <p>
           Register your profile.
           The attributes you select here, will determine the pictures you can see.
