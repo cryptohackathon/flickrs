@@ -12,6 +12,8 @@ import { Container, Row } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import * as Icon from 'react-bootstrap-icons';
+
 class App extends React.Component {
   constructor(props) {
     super(props);
