@@ -175,6 +175,36 @@ class App extends React.Component {
 
     return (
       <React.Fragment>
+        <Container>
+          <h1>Flick.rs</h1>
+          <p>
+            Flick.rs is a picture sharing application, as
+              <a href="https://github.com/cryptohackathon/flickrs/">our submission</a>
+              to the <a href="https://cryptohackathon.eu">FENTEC Crypto Hackathon</a>.
+            Feel free to take a look at <a href="https://github.com/cryptohackathon/flickrs/raw/master/presentation.pdf">our presentation</a>!
+            It demonstrates the feasibility of running <a href="https://en.wikipedia.org/wiki/Attribute-based_encryption">attribute-based encryption</a> schemes in the web browser.
+          </p>
+          <p>
+            The technology stack is built around the <a href="https://eprint.iacr.org/2018/753">ABE scheme of Yan Michalevsky and Marc Joye 2018</a>,
+              which we refer to as DIPPE, for Decentralised Inner Product Predicate Encryption.
+            We have <a href="https://gitlab.com/etrovub/smartnets/cife-rs">implemented most of the scheme in Rust</a>,
+              and <a href="https://gitlab.com/etrovub/smartnets/flickrs">wrote this web application around it</a>.
+            The <a href="https://gitlab.com/etrovub/smartnets/flickrs/-/tree/master/flickrs-server">server side code</a> is written using <a href="https://api.rocket.rs/">Rocket</a>,
+              while the client uses <a href="https://reactjs.org/">React</a> for the user interface,
+              and <a href="https://webassembly.org/">WebAssembly</a> with <a href="https://github.com/rustwasm/wasm-pack/">wasm-pack</a>.
+            You&apos;re reading this correctly,
+              your browser is running all the fancy cryptography,
+              including <a href="https://github.com/dabch/rabe-bn">BN254 elliptic curve pairings</a>,
+              and <a href="https://docs.rs/chacha20poly1305/">ChaCha20Poly1305</a>!
+          </p>
+          <p>
+            While the DIPPE scheme is built around multiple authorities, our demonstrator has one single authority, running on our server.
+            When you request your attributes down below, the authority hands out decryption keys to your browser.
+            You can decrypt the pictures that have only a subset of the attributes that you request;
+              this policy is called a &quot;conjunction policy&quot;.
+            The DIPPE scheme allows for multiple other policies, but these remain unimplemented in our implementation.
+          </p>
+        </Container>
         <div class="container-md">
           <Row className="my-3 py-3 border rounded shadow">
             <div className="py-3 col-md-6">
