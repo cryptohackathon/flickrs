@@ -138,7 +138,7 @@ class Upload extends React.Component {
 
     return attrs && (
       <React.Fragment>
-        <h2 class="text-center">Upload</h1>
+        <h2 class="text-center">Upload</h2>
         <p>
           Upload an image.
           The attributes you select here, will determine who can see the uploaded picture.
