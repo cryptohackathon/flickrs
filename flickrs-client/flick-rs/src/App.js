@@ -178,8 +178,8 @@ class App extends React.Component {
         <Container>
           <h1>Flick.rs</h1>
           <p>
-            Flick.rs is a picture sharing application, as
-              <a href="https://github.com/cryptohackathon/flickrs/">our submission</a>
+            Flick.rs is a picture sharing application,
+              as <a href="https://github.com/cryptohackathon/flickrs/">our submission</a>
               to the <a href="https://cryptohackathon.eu">FENTEC Crypto Hackathon</a>.
             Feel free to take a look at <a href="https://github.com/cryptohackathon/flickrs/raw/master/presentation.pdf">our presentation</a>!
             It demonstrates the feasibility of running <a href="https://en.wikipedia.org/wiki/Attribute-based_encryption">attribute-based encryption</a> schemes in the web browser.
