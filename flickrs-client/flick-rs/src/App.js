@@ -136,9 +136,15 @@ class App extends React.Component {
 
     const data = await resp.json();
 
-    data["ids"].forEach(async (id) => {
-      await this.getImage(id);
-    });
+    const req = data["ids"].map(this.getImage);
+
+    Promise.all(req).then(() => {
+      toast.success("Everything downloaded! 🎉");
+    }).catch((e) => console.log(e));
+
+    // data["ids"].forEach(async (id) => {
+    //   await this.getImage(id);
+    // });
   }
 
   /// Is called by the Registration component
@@ -203,7 +209,7 @@ class App extends React.Component {
             While the DIPPE scheme is built around multiple authorities, our demonstrator has one single authority, running on our server.
             When you request your attributes down below, the authority hands out decryption keys to your browser.
             You can decrypt the pictures that have only a subset of the attributes that you request;
-              this policy is called a &quot;conjunction policy&quot;.
+            this policy is called a &quot;conjunction policy&quot;.
             The DIPPE scheme allows for multiple other policies, but these remain unimplemented in our implementation.
           </p>
           <p class="bs-callout bs-callout-danger">
